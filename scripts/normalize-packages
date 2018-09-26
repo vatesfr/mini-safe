@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+const isEmpty = require("lodash/isEmpty");
+const { getPackages, writeFile } = require("./utils");
+
+require("exec-promise")(() =>
+  getPackages(true).map(({ dir, name, package: pkg, relativeDir }) => {
+    pkg.private = true;
+    pkg.name = name;
+    pkg.homepage = `https://github.com/vatesfr/mini-safe/tree/master/${relativeDir}`;
+    pkg.bugs = `https://github.com/vatesfr/mini-safe/issues`;
+    pkg.repository = {
+      type: "git",
+      url: "https://github.com/vatesfr/mini-safe.git",
+    };
+    pkg.engines = {
+      node: ">=8",
+    };
+
+    return Promise.all([
+      writeFile(`${dir}/package.json`, JSON.stringify(pkg, null, 2) + "\n"),
+    ]);
+  })
+);

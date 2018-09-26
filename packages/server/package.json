@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "server",
+  "homepage": "https://github.com/vatesfr/mini-safe/tree/master/packages/server",
+  "bugs": "https://github.com/vatesfr/mini-safe/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vatesfr/mini-safe.git"
+  },
+  "scripts": {
+    "start": "./index.js"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "esm": "^3.0.84",
+    "koa": "^2.5.3",
+    "koa-static": "^5.0.0"
+  }
+}
