@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "cli",
+  "homepage": "https://github.com/vatesfr/mini-safe/tree/master/packages/cli",
+  "bugs": "https://github.com/vatesfr/mini-safe/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vatesfr/mini-safe.git"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "esm": "^3.0.84",
+    "http-request-plus": "^0.6.0",
+    "json-rpc-protocol": "^0.12.0"
+  }
+}
