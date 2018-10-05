@@ -9,11 +9,11 @@ const app = new Koa();
 var entries = new Map();
 let idCounter = 0;
 
-const METHODS = {
-  subtract([a, b]) {
-    return a - b;
-  },
+function generateId() {
+  idCounter += 1;
+}
 
+const METHODS = {
   createEntry([nameEntry, contentEntry]) {
     const entry = {
       id: idCounter,
@@ -23,56 +23,45 @@ const METHODS = {
       updated: Date.now(),
     };
 
-    idCounter += 1;
+    generateId();
     entries.set(entry.id, entry);
 
-    return entry.name + " created";
+    return entry.id;
   },
 
   listEntries() {
-    let res = "";
-    entries.forEach(function(entry) {
-      res +=
-        "(" +
-        entry.id +
-        ") " +
-        entry.name +
-        " " +
-        entry.content +
-        " " +
-        entry.created +
-        " " +
-        entry.updated +
-        "\n";
-    });
-    return res;
+    return Array.from(entries);
   },
 
   deleteEntry([idEntry]) {
     const entry = entries.get(+idEntry);
     if (entry === undefined) {
-      return "This entry doesn't exist !";
+      throw new Error(`could not find entry ${idEntry}`);
     }
 
     entries.delete(+idEntry);
-    return "(" + entry.id + ") " + entry.name + " is deleted";
   },
 
   updateEntry([idEntry, nameEntry, contentEntry]) {
-    let res = "This entry doesn't exist !";
+    let res;
     if (nameEntry === undefined || contentEntry === undefined) {
-      return "params ? new name & new content expected";
+      throw new Error(
+        `could not update entry ${idEntry}, name & content expected`
+      );
     } else {
       entries.forEach(function(entry) {
         if (entry.id === +idEntry) {
           entry.name = nameEntry;
           entry.content = contentEntry;
           entry.updated = Date.now();
-          res = idEntry + " is updated";
+          res = idEntry;
         }
       });
     }
-    return res;
+
+    if (res === undefined) {
+      throw new Error(`could not find entry ${idEntry}`);
+    }
   },
 };
 

@@ -1,7 +1,8 @@
 {
   "private": true,
   "devDependencies": {
-    "eslint": "^5.6.0",
+    "eslint": "^5.6.1",
+    "eslint-config-defaults": "^9.0.0",
     "eslint-config-prettier": "^3.1.0",
     "exec-promise": "^0.7.0",
     "husky": "^1.0.0",
@@ -13,18 +14,5 @@
     "hooks": {
       "pre-commit": "scripts/lint-staged"
     }
-  },
-  "dependencies": {
-    "babel": "^6.23.0",
-    "babel-register": "^6.26.0",
-    "co-body": "^6.0.0",
-    "esm": "^3.0.84",
-    "get-stream": "^4.0.0",
-    "http-request-plus": "^0.6.0",
-    "json-rpc-protocol": "^0.12.0",
-    "koa": "^2.5.3",
-    "koa-static": "^5.0.0",
-    "node-dev": "^3.1.3",
-    "parse-json": "^4.0.0"
   }
 }
