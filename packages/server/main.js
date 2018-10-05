@@ -10,20 +10,19 @@ var entries = new Map();
 let idCounter = 0;
 
 function generateId() {
-  idCounter += 1;
+  return idCounter += 1;
 }
 
 const METHODS = {
   createEntry([nameEntry, contentEntry]) {
     const entry = {
-      id: idCounter,
+      id: generateId(),
       name: nameEntry,
       content: contentEntry,
       created: Date.now(),
       updated: Date.now(),
     };
 
-    generateId();
     entries.set(entry.id, entry);
 
     return entry.id;
@@ -34,35 +33,28 @@ const METHODS = {
   },
 
   deleteEntry([idEntry]) {
-    const entry = entries.get(+idEntry);
-    if (entry === undefined) {
+    if (entries.delete(+idEntry) === undefined) {
       throw new Error(`could not find entry ${idEntry}`);
     }
-
-    entries.delete(+idEntry);
   },
 
   updateEntry([idEntry, nameEntry, contentEntry]) {
-    let res;
     if (nameEntry === undefined || contentEntry === undefined) {
       throw new Error(
         `could not update entry ${idEntry}, name & content expected`
       );
-    } else {
-      entries.forEach(function(entry) {
-        if (entry.id === +idEntry) {
-          entry.name = nameEntry;
-          entry.content = contentEntry;
-          entry.updated = Date.now();
-          res = idEntry;
-        }
-      });
     }
 
-    if (res === undefined) {
+    const entry = entries.get(+idEntry);
+    if (entry === undefined) {
       throw new Error(`could not find entry ${idEntry}`);
     }
-  },
+    
+    entry.name = nameEntry;
+    entry.content = contentEntry;
+    entry.updated = Date.now();
+    entries.set(+idEntry, entry);
+  }
 };
 
 app.use(async (ctx, next) => {
