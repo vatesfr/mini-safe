@@ -10,7 +10,7 @@ var entries = new Map();
 let idCounter = 0;
 
 function generateId() {
-  return idCounter += 1;
+  return (idCounter += 1);
 }
 
 const METHODS = {
@@ -33,7 +33,7 @@ const METHODS = {
   },
 
   deleteEntry([idEntry]) {
-    if (entries.delete(+idEntry) === undefined) {
+    if (!entries.delete(+idEntry)) {
       throw new Error(`could not find entry ${idEntry}`);
     }
   },
@@ -49,12 +49,12 @@ const METHODS = {
     if (entry === undefined) {
       throw new Error(`could not find entry ${idEntry}`);
     }
-    
+
     entry.name = nameEntry;
     entry.content = contentEntry;
     entry.updated = Date.now();
     entries.set(+idEntry, entry);
-  }
+  },
 };
 
 app.use(async (ctx, next) => {
