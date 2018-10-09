@@ -6,9 +6,54 @@ import { format, parse } from "json-rpc-protocol";
 // see https://koajs.com/
 const app = new Koa();
 
+var entries = new Map();
+let idCounter = 0;
+
+function generateId() {
+  return (idCounter += 1);
+}
+
 const METHODS = {
-  subtract([a, b]) {
-    return a - b;
+  createEntry([nameEntry, contentEntry]) {
+    const entry = {
+      id: generateId(),
+      name: nameEntry,
+      content: contentEntry,
+      created: Date.now(),
+      updated: Date.now(),
+    };
+
+    entries.set(entry.id, entry);
+
+    return entry.id;
+  },
+
+  listEntries() {
+    return Array.from(entries);
+  },
+
+  deleteEntry([idEntry]) {
+    if (!entries.delete(+idEntry)) {
+      throw new Error(`could not find entry ${idEntry}`);
+    }
+  },
+
+  updateEntry([idEntry, nameEntry, contentEntry]) {
+    if (nameEntry === undefined || contentEntry === undefined) {
+      throw new Error(
+        `could not update entry ${idEntry}, name & content expected`
+      );
+    }
+
+    const entry = entries.get(+idEntry);
+    if (entry === undefined) {
+      throw new Error(`could not find entry ${idEntry}`);
+    }
+
+    entry.name = nameEntry;
+    entry.content = contentEntry;
+    entry.updated = Date.now();
+    entries.set(+idEntry, entry);
   },
 };
 
