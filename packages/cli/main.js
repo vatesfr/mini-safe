@@ -4,7 +4,8 @@ import hrp from "http-request-plus";
 import { format, parse } from "json-rpc-protocol";
 
 async function main() {
-  const [, , method, ...params] = process.argv;
+  const params = require("minimist")(process.argv.slice(2));
+  const method = params._[0];
 
   const response = parse(
     await hrp

@@ -14,11 +14,11 @@ function generateId() {
 }
 
 const METHODS = {
-  createEntry([nameEntry, contentEntry]) {
+  createEntry({ name, content }) {
     const entry = {
       id: generateId(),
-      name: nameEntry,
-      content: contentEntry,
+      name,
+      content,
       created: Date.now(),
       updated: Date.now(),
     };
@@ -32,28 +32,32 @@ const METHODS = {
     return Array.from(entries);
   },
 
-  deleteEntry([idEntry]) {
-    if (!entries.delete(+idEntry)) {
-      throw new Error(`could not find entry ${idEntry}`);
+  deleteEntry({ id }) {
+    if (!entries.delete(+id)) {
+      throw new Error(`could not find entry ${id}`);
     }
   },
 
-  updateEntry([idEntry, nameEntry, contentEntry]) {
-    if (nameEntry === undefined || contentEntry === undefined) {
-      throw new Error(
-        `could not update entry ${idEntry}, name & content expected`
-      );
+  updateEntry({ id, name, content }) {
+    if (name === undefined && content === undefined) {
+      throw new Error(`could not update entry ${id}, name or content expected`);
     }
 
-    const entry = entries.get(+idEntry);
+    const entry = entries.get(+id);
     if (entry === undefined) {
-      throw new Error(`could not find entry ${idEntry}`);
+      throw new Error(`could not find entry ${id}`);
     }
 
-    entry.name = nameEntry;
-    entry.content = contentEntry;
+    if (name !== undefined) {
+      entry.name = name;
+    }
+
+    if (content !== undefined) {
+      entry.content = content;
+    }
+
     entry.updated = Date.now();
-    entries.set(+idEntry, entry);
+    entries.set(+id, entry);
   },
 };
 
