@@ -1,5 +1,5 @@
 module.exports = {
-  env: { node: true },
+  env: { es6: true, node: true },
   extends: ["eslint:recommended", "prettier"],
   parserOptions: {
     ecmaVersion: 8,
