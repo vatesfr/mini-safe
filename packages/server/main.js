@@ -14,11 +14,11 @@ function generateId() {
 }
 
 const METHODS = {
-  createEntry({name, content}) {
+  createEntry({ name, content }) {
     const entry = {
       id: generateId(),
-      name: name,
-      content: content,
+      name,
+      content,
       created: Date.now(),
       updated: Date.now(),
     };
@@ -32,17 +32,15 @@ const METHODS = {
     return Array.from(entries);
   },
 
-  deleteEntry({id}) {
+  deleteEntry({ id }) {
     if (!entries.delete(+id)) {
       throw new Error(`could not find entry ${id}`);
     }
   },
 
-  updateEntry({id, name, content}) {
+  updateEntry({ id, name, content }) {
     if (name === undefined && content === undefined) {
-      throw new Error(
-        `could not update entry ${id}, name or content expected`
-      );
+      throw new Error(`could not update entry ${id}, name or content expected`);
     }
 
     const entry = entries.get(+id);
