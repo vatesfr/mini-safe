@@ -59,6 +59,11 @@ const METHODS = {
     entry.updated = Date.now();
     entries.set(+id, entry);
   },
+
+  deleteEntries() {
+    entries.clear();
+    idCounter = 0;
+  },
 };
 
 app.use(async (ctx, next) => {
