@@ -15,6 +15,10 @@ async function main() {
       .readAll("utf-8")
   );
 
-  console.log(response.result);
+  if (response.type === "response") {
+    console.log(response.result);
+  } else if (response.type === "error") {
+    console.error(response.error);
+  }
 }
 main().catch(console.error.bind(console, "FATAL:"));

@@ -77,7 +77,7 @@ app.use(async (ctx, next) => {
   }
 
   const result = method(request.params);
-  ctx.body = format.response(request.id, result);
+  ctx.body = format.response(request.id, result === undefined ? true : result);
 });
 
 app.use(koaStatic(`${__dirname}/../pages/build`));
