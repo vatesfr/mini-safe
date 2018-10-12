@@ -36,6 +36,7 @@ const METHODS = {
     if (!entries.delete(+id)) {
       throw new Error(`could not find entry ${id}`);
     }
+    return null;
   },
 
   updateEntry({ id, name, content }) {
@@ -58,6 +59,7 @@ const METHODS = {
 
     entry.updated = Date.now();
     entries.set(+id, entry);
+    return null;
   },
 };
 

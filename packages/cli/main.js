@@ -16,9 +16,7 @@ async function main() {
   );
 
   if (response.type === "response") {
-    if (response.result !== undefined) {
-      console.log(response.result);
-    }
+    console.log(response.result);
   } else if (response.type === "error") {
     console.error(response.error);
   }
