@@ -75,21 +75,22 @@ app.use(async (ctx, next) => {
     return next();
   }
 
-  const request = parse(await getStream(ctx.req));
-  if (request.type !== "request") {
-    throw new InvalidRequest();
-  }
-
   try {
+    const request = parse(await getStream(ctx.req));
+    if (request.type !== "request") {
+      throw new InvalidRequest();
+    }
+
     const method = METHODS[request.method];
     if (method === undefined) {
       throw new MethodNotFound(request.method);
     }
+
     const result = method(request.params);
     ctx.body = format.response(request.id, result);
   } catch (err) {
     ctx.body = format.error(
-      request.id,
+      0,
       new JsonRpcError(err.message, err.code, err.data)
     );
   }
