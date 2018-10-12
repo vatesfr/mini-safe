@@ -70,6 +70,14 @@ const METHODS = {
   },
 };
 
+function findMethod(methodToFind) {
+  const method = METHODS[methodToFind];
+  if (method === undefined) {
+    throw new MethodNotFound(`could not find method ${method}`);
+  }
+  return method;
+}
+
 app.use(async (ctx, next) => {
   if (ctx.path !== "/api/") {
     return next();
@@ -81,10 +89,7 @@ app.use(async (ctx, next) => {
   }
 
   try {
-    const method = METHODS[request.method];
-    if (method === undefined) {
-      throw new MethodNotFound(`could not find method ${request.method}`);
-    }
+    const method = findMethod(request.method);
     const result = method(request.params);
     ctx.body = format.response(request.id, result);
   } catch (err) {
