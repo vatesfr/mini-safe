@@ -20,7 +20,7 @@ async function main() {
       console.log(response.result);
     }
   } else if (response.type === "error") {
-    console.log(response.error.message + " - " + response.error.data);
+    console.error(response.error);
   }
 }
 main().catch(console.error.bind(console, "FATAL:"));
