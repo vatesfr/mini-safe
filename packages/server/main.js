@@ -70,14 +70,6 @@ const METHODS = {
   },
 };
 
-function findMethod(methodToFind) {
-  const method = METHODS[methodToFind];
-  if (method === undefined) {
-    throw new MethodNotFound(`could not find method ${method}`);
-  }
-  return method;
-}
-
 app.use(async (ctx, next) => {
   if (ctx.path !== "/api/") {
     return next();
@@ -85,11 +77,14 @@ app.use(async (ctx, next) => {
 
   const request = parse(await getStream(ctx.req));
   if (request.type !== "request") {
-    throw new InvalidRequest("invalid JSON-RPC message, expected request");
+    throw new InvalidRequest();
   }
 
   try {
-    const method = findMethod(request.method);
+    const method = METHODS[request.method];
+    if (method === undefined) {
+      throw new MethodNotFound(method);
+    }
     const result = method(request.params);
     ctx.body = format.response(request.id, result);
   } catch (err) {
