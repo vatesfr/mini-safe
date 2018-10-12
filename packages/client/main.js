@@ -74,7 +74,18 @@ async function main() {
         .readAll("utf-8")
     );
 
-    console.log(response.result);
+    if (response.result !== undefined) {
+      console.log(response.result);
+    }
+
+    if (response.error !== undefined) {
+      if (response.error.code === -32601) {
+        /* Method not found */
+        console.log(response.error.message);
+      } else {
+        console.log(response.error.message + " - " + response.error.data);
+      }
+    }
   }
 }
 main().catch(console.error.bind(console, "FATAL : "));
