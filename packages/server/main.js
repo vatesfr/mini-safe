@@ -87,7 +87,10 @@ app.use(async (ctx, next) => {
     }
 
     const result = method(request.params);
-    ctx.body = format.response(request.id, result);
+    ctx.body = format.response(
+      request.id,
+      result === undefined ? true : result
+    );
   } catch (err) {
     ctx.body = format.error(
       0,
