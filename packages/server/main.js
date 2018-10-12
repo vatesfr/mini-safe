@@ -36,7 +36,6 @@ const METHODS = {
     if (!entries.delete(+id)) {
       throw new Error(`could not find entry ${id}`);
     }
-    return null;
   },
 
   updateEntry({ id, name, content }) {
@@ -59,7 +58,6 @@ const METHODS = {
 
     entry.updated = Date.now();
     entries.set(+id, entry);
-    return null;
   },
 };
 
@@ -79,7 +77,7 @@ app.use(async (ctx, next) => {
   }
 
   const result = method(request.params);
-  ctx.body = format.response(request.id, result);
+  ctx.body = format.response(request.id, result === undefined ? true : result);
 });
 
 app.use(koaStatic(`${__dirname}/../pages/build`));
