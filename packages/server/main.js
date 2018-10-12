@@ -62,7 +62,6 @@ const METHODS = {
 
   deleteEntries() {
     entries.clear();
-    idCounter = 0;
   },
 };
 
