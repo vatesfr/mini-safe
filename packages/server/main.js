@@ -83,7 +83,7 @@ app.use(async (ctx, next) => {
   try {
     const method = METHODS[request.method];
     if (method === undefined) {
-      throw new MethodNotFound(method);
+      throw new MethodNotFound(request.method);
     }
     const result = method(request.params);
     ctx.body = format.response(request.id, result);
