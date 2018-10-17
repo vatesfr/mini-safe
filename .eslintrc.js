@@ -1,6 +1,6 @@
 module.exports = {
   env: { es6: true, node: true },
-  extends: ["eslint:recommended", "prettier"],
+  extends: ["standard", "prettier"],
   parserOptions: {
     ecmaVersion: 8,
     sourceType: "module",
