@@ -93,7 +93,7 @@ async function main() {
         assert.equal(response.type, "error");
         assert.equal(
           response.error.message,
-          new MethodNotFound().message + ": inexistantMethod"
+          new MethodNotFound("inexistantMethod").message
         );
       },
     ],
