@@ -68,10 +68,6 @@ const METHODS = {
     entry.updated = Date.now();
     entries.set(+id, entry);
   },
-
-  deleteEntries() {
-    entries.clear();
-  },
 };
 
 app.use(async (ctx, next) => {

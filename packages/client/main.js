@@ -1,7 +1,12 @@
 /* eslint-disable no-console */
 
 import hrp from "http-request-plus";
-import { format, parse } from "json-rpc-protocol";
+import {
+  format,
+  parse,
+  InvalidParameters,
+  MethodNotFound,
+} from "json-rpc-protocol";
 import assert from "assert";
 
 async function main() {
@@ -43,6 +48,55 @@ async function main() {
     ],
     ["updateEntry", { id: 3, name: "only_name3_modified" }],
     ["updateEntry", { id: 1, content: "only_content1_modified" }],
+    [
+      "listEntries",
+      {},
+      function(response) {
+        assert.equal(response.result[1][1].name, "only_name3_modified");
+        assert.equal(response.result[1][1].content, "content3");
+        assert.equal(response.result[0][1].name, "name1_modified");
+        assert.equal(response.result[0][1].content, "only_content1_modified");
+      },
+    ],
+    [
+      /* Error: could not find entry 0 */
+      "deleteEntry",
+      { id: 0 },
+      function(response) {
+        assert.equal(response.type, "error");
+        assert.equal(response.error.message, new InvalidParameters().message);
+      },
+    ],
+    [
+      /* Error: name or content expected */
+      "updateEntry",
+      { id: 1 },
+      function(response) {
+        assert.equal(response.type, "error");
+        assert.equal(response.error.message, new InvalidParameters().message);
+      },
+    ],
+    [
+      /* Error: could not find entry 0 */
+      "updateEntry",
+      { id: 0, name: "name0", content: "content0" },
+      function(response) {
+        assert.equal(response.type, "error");
+        assert.equal(response.error.message, new InvalidParameters().message);
+      },
+    ],
+    [
+      /* Error: method not found */
+      "inexistantMethod",
+      {},
+      function(response) {
+        assert.equal(response.type, "error");
+        assert.equal(
+          response.error.message,
+          new MethodNotFound().message + ": inexistantMethod"
+        );
+      },
+    ],
     [
       "listEntries",
       {},
