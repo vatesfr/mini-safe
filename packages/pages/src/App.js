@@ -1,18 +1,29 @@
-import React, { Component } from "react";
+import React from "react";
+import { provideState, injectState } from "@julien-f/freactal";
+import { format, parse } from "json-rpc-protocol";
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
-}
+const App = ({ effects, state }) => (
+  <div>
+    <button type="button" onClick={effects.refreshEntries}>
+      Refresh
+    </button>
+    <ul>
+      {state.entries.map(entry => <li key={entry.id}>{entry.name}</li>)}
+    </ul>
+  </div>
+);
 
-export default App;
+export default provideState({
+  initialState: () => ({
+    entries: [],
+  }),
+  effects: {
+    async refreshEntries() {
+      const response = await fetch("/api/", {
+        method: "post",
+        body: format.request(0, "listEntries", {}),
+      });
+      this.state.entries = parse(await response.text()).result;
+    },
+  },
+})(injectState(App));
