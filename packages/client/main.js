@@ -13,12 +13,12 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.deepEqual(response.result[0][1].name, "name1");
-        assert.deepEqual(response.result[0][1].content, "content1");
-        assert.deepEqual(response.result[1][1].name, "name2");
-        assert.deepEqual(response.result[1][1].content, "content2");
-        assert.deepEqual(response.result[2][1].name, "name3");
-        assert.deepEqual(response.result[2][1].content, "content3");
+        assert.equal(response.result[0][1].name, "name1");
+        assert.equal(response.result[0][1].content, "content1");
+        assert.equal(response.result[1][1].name, "name2");
+        assert.equal(response.result[1][1].content, "content2");
+        assert.equal(response.result[2][1].name, "name3");
+        assert.equal(response.result[2][1].content, "content3");
       },
     ],
     [
@@ -29,8 +29,8 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.deepEqual(response.result[0][1].name, "name1_modified");
-        assert.deepEqual(response.result[0][1].content, "content1_modified");
+        assert.equal(response.result[0][1].name, "name1_modified");
+        assert.equal(response.result[0][1].content, "content1_modified");
       },
     ],
     ["deleteEntry", { id: 2 }],
@@ -47,13 +47,10 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.deepEqual(response.result[1][1].name, "only_name3_modified");
-        assert.deepEqual(response.result[1][1].content, "content3");
-        assert.deepEqual(response.result[0][1].name, "name1_modified");
-        assert.deepEqual(
-          response.result[0][1].content,
-          "only_content1_modified"
-        );
+        assert.equal(response.result[1][1].name, "only_name3_modified");
+        assert.equal(response.result[1][1].content, "content3");
+        assert.equal(response.result[0][1].name, "name1_modified");
+        assert.equal(response.result[0][1].content, "only_content1_modified");
       },
     ],
   ];
