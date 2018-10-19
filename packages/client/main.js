@@ -55,10 +55,7 @@ async function main() {
         assert.equal(response.result[1].name, "only_name3_modified");
         assert.equal(response.result[1].content, "content3");
         assert.equal(response.result[0].name, "name1_modified");
-        assert.equal(
-          response.result[0].content,
-          "only_content1_modified"
-        );
+        assert.equal(response.result[0].content, "only_content1_modified");
       },
     ],
     [
@@ -67,10 +64,7 @@ async function main() {
       { id: 0 },
       function(response) {
         assert.equal(response.type, "error");
-        assert.equal(
-          response.error.message,
-          new InvalidParameters().message
-        );
+        assert.equal(response.error.message, new InvalidParameters().message);
       },
     ],
     [
@@ -79,10 +73,7 @@ async function main() {
       { id: 1 },
       function(response) {
         assert.equal(response.type, "error");
-        assert.equal(
-          response.error.message,
-          new InvalidParameters().message
-        );
+        assert.equal(response.error.message, new InvalidParameters().message);
       },
     ],
     [
@@ -91,10 +82,7 @@ async function main() {
       { id: 0, name: "name0", content: "content0" },
       function(response) {
         assert.equal(response.type, "error");
-        assert.equal(
-          response.error.message,
-          new InvalidParameters().message
-        );
+        assert.equal(response.error.message, new InvalidParameters().message);
       },
     ],
     [
@@ -116,10 +104,7 @@ async function main() {
         assert.equal(response.result[1].name, "only_name3_modified");
         assert.equal(response.result[1].content, "content3");
         assert.equal(response.result[0].name, "name1_modified");
-        assert.equal(
-          response.result[0].content,
-          "only_content1_modified"
-        );
+        assert.equal(response.result[0].content, "only_content1_modified");
       },
     ],
   ];
