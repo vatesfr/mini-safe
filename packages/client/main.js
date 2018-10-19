@@ -128,7 +128,7 @@ async function main() {
     console.log("\n>>> method: " + TESTCASE[i][0]);
     const response = parse(
       await hrp
-        .post("http://localhost:3000/api/", {
+        .post("http://localhost:4000/api/", {
           body: format.request(0, TESTCASE[i][0], TESTCASE[i][1]),
         })
         .readAll("utf-8")

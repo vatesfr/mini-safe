@@ -9,7 +9,7 @@ async function main() {
 
   const response = parse(
     await hrp
-      .post("http://localhost:3000/api/", {
+      .post("http://localhost:4000/api/", {
         body: format.request(0, method, params),
       })
       .readAll("utf-8")
