@@ -36,7 +36,7 @@ const METHODS = {
   },
 
   listEntries() {
-    return Array.from(entries);
+    return Array.from(entries.values());
   },
 
   deleteEntry({ id }) {
