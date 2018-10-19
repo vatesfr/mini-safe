@@ -18,12 +18,12 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.strictEqual(response.result[0][1].name, "name1");
-        assert.strictEqual(response.result[0][1].content, "content1");
-        assert.strictEqual(response.result[1][1].name, "name2");
-        assert.strictEqual(response.result[1][1].content, "content2");
-        assert.strictEqual(response.result[2][1].name, "name3");
-        assert.strictEqual(response.result[2][1].content, "content3");
+        assert.strictEqual(response.result[0].name, "name1");
+        assert.strictEqual(response.result[0].content, "content1");
+        assert.strictEqual(response.result[1].name, "name2");
+        assert.strictEqual(response.result[1].content, "content2");
+        assert.strictEqual(response.result[2].name, "name3");
+        assert.strictEqual(response.result[2].content, "content3");
       },
     ],
     [
@@ -34,8 +34,8 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.strictEqual(response.result[0][1].name, "name1_modified");
-        assert.strictEqual(response.result[0][1].content, "content1_modified");
+        assert.strictEqual(response.result[0].name, "name1_modified");
+        assert.strictEqual(response.result[0].content, "content1_modified");
       },
     ],
     ["deleteEntry", { id: 2 }],
@@ -43,7 +43,7 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.notStrictEqual(response.result[1][0], 2);
+        assert.notStrictEqual(response.result[1], 2);
       },
     ],
     ["updateEntry", { id: 3, name: "only_name3_modified" }],
@@ -52,11 +52,11 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.strictEqual(response.result[1][1].name, "only_name3_modified");
-        assert.strictEqual(response.result[1][1].content, "content3");
-        assert.strictEqual(response.result[0][1].name, "name1_modified");
+        assert.strictEqual(response.result[1].name, "only_name3_modified");
+        assert.strictEqual(response.result[1].content, "content3");
+        assert.strictEqual(response.result[0].name, "name1_modified");
         assert.strictEqual(
-          response.result[0][1].content,
+          response.result[0].content,
           "only_content1_modified"
         );
       },
@@ -113,11 +113,11 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.strictEqual(response.result[1][1].name, "only_name3_modified");
-        assert.strictEqual(response.result[1][1].content, "content3");
-        assert.strictEqual(response.result[0][1].name, "name1_modified");
+        assert.strictEqual(response.result[1].name, "only_name3_modified");
+        assert.strictEqual(response.result[1].content, "content3");
+        assert.strictEqual(response.result[0].name, "name1_modified");
         assert.strictEqual(
-          response.result[0][1].content,
+          response.result[0].content,
           "only_content1_modified"
         );
       },
