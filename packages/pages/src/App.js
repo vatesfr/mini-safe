@@ -10,7 +10,9 @@ const App = ({ effects, state }) => (
       </button>
       <ul>
         {state.entries.map(entry => (
-          <li key={entry.id}>{entry.name} {entry.content}</li>
+          <li key={entry.id}>
+            {entry.name} {entry.content}
+          </li>
         ))}
       </ul>
     </div>
