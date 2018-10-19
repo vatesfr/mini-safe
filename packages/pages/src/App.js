@@ -47,8 +47,8 @@ const App = ({ effects, state }) => (
 export default provideState({
   initialState: () => ({
     entries: [],
-    name: "name",
-    content: "content",
+    name: "",
+    content: "",
   }),
   effects: {
     async refreshEntries() {
@@ -66,6 +66,8 @@ export default provideState({
           content: this.state.content,
         }),
       });
+      this.state.name = "";
+      this.state.content = "";
     },
     async changeName(
       _,
