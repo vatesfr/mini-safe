@@ -125,7 +125,6 @@ async function main() {
   ];
 
   for (var i = 0; i < TESTCASE.length; i++) {
-    console.log("\n>>> method: " + TESTCASE[i][0]);
     const response = parse(
       await hrp
         .post("http://localhost:4000/api/", {
@@ -134,14 +133,7 @@ async function main() {
         .readAll("utf-8")
     );
 
-    if (response.type === "response") {
-      console.log(response.result);
-    } else if (response.type === "error") {
-      console.error(response.error);
-    }
-
     if (TESTCASE[i][2] !== undefined) {
-      console.log("\n>>> test: " + TESTCASE[i][2]);
       TESTCASE[i][2](response);
     }
   }
