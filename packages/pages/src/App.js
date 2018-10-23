@@ -51,9 +51,9 @@ const App = ({ effects, state }) => (
           value={state.id}
           onChange={effects.changeId}
         />
-      <button type="button" onClick={effects.deleteEntry}>
-        Delete
-      </button>
+        <button type="button" onClick={effects.deleteEntry}>
+          Delete
+        </button>
       </label>
     </div>
   </div>
@@ -92,7 +92,7 @@ export default provideState({
           id: this.state.id,
         }),
       });
-      this.state.id = ""
+      this.state.id = "";
     },
     async changeName(
       _,
