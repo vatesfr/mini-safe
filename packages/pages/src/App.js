@@ -11,8 +11,16 @@ const App = ({ effects, state }) => (
       <ul>
         {state.entries.map(entry => (
           <li key={entry.id}>
-            {entry.name} {entry.content} 
-            <button type="button" id="idEntry" name="deleteEntry" value={entry.id} onClick={effects.deleteEntry}>Delete</button>
+            {entry.name} {entry.content}
+            <button
+              type="button"
+              id="idEntry"
+              name="deleteEntry"
+              value={entry.id}
+              onClick={effects.deleteEntry}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
@@ -86,12 +94,10 @@ export default provideState({
         }),
       });
       this.state.id = "";
+      await this.effects.refreshEntries();
       const parsed = parse(await response.text());
-      if(parsed.type === 'response') {
-        console.log(parsed.result);
-        await this.effects.refreshEntries();
-      } else if (parsed.type === 'error') {
-        console.log(parsed.error);
+      if (parsed.type === "error") {
+        console.error(parsed.error);
       }
     },
     async changeName(
