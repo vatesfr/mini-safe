@@ -18,5 +18,8 @@
     "hooks": {
       "pre-commit": "scripts/lint-staged"
     }
+  },
+  "dependencies": {
+    "reaclette": "^0.6.0"
   }
 }

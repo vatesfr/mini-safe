@@ -18,6 +18,7 @@
     "get-stream": "^4.0.0",
     "json-rpc-protocol": "^0.12.0",
     "koa": "^2.5.3",
-    "koa-static": "^5.0.0"
+    "koa-static": "^5.0.0",
+    "reaclette": "^0.6.0"
   }
 }

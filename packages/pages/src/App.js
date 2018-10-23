@@ -1,5 +1,5 @@
 import React from "react";
-import { provideState, injectState } from "@julien-f/freactal";
+import { provideState, injectState } from "reaclette";
 import { format, parse } from "json-rpc-protocol";
 
 const App = ({ effects, state }) => (
@@ -69,6 +69,7 @@ export default provideState({
       this.state.name = "";
       this.state.content = "";
       await this.effects.refreshEntries();
+      
     },
     async changeName(
       _,
