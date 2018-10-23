@@ -18,5 +18,6 @@
     "hooks": {
       "pre-commit": "scripts/lint-staged"
     }
-  }
+  },
+  "dependencies": {}
 }
