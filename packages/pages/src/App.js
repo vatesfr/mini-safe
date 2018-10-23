@@ -11,7 +11,8 @@ const App = ({ effects, state }) => (
       <ul>
         {state.entries.map(entry => (
           <li key={entry.id}>
-            {entry.id} {entry.name} {entry.content}
+            {entry.name} {entry.content} 
+            <button type="button" id="idEntry" name="deleteEntry" value={entry.id} onClick={effects.deleteEntry}>Delete</button>
           </li>
         ))}
       </ul>
@@ -32,7 +33,7 @@ const App = ({ effects, state }) => (
         <input
           type="text"
           id="contentEntry"
-          name="name"
+          name="content"
           value={state.content}
           onChange={effects.changeContent}
         />
@@ -40,21 +41,6 @@ const App = ({ effects, state }) => (
       <button type="button" onClick={effects.createEntry}>
         Create
       </button>
-    </div>
-    <div name="deleteEntry">
-      <label>
-        Id
-        <input
-          type="text"
-          id="idEntry"
-          name="id"
-          value={state.id}
-          onChange={effects.changeId}
-        />
-        <button type="button" onClick={effects.deleteEntry}>
-          Delete
-        </button>
-      </label>
     </div>
   </div>
 );
@@ -86,15 +72,27 @@ export default provideState({
       this.state.content = "";
       await this.effects.refreshEntries();
     },
-    async deleteEntry() {
-      await fetch("/api/", {
+    async deleteEntry(
+      _,
+      {
+        target: { value },
+      }
+    ) {
+      this.state.id = value;
+      const response = await fetch("/api/", {
         method: "post",
         body: format.request(0, "deleteEntry", {
           id: this.state.id,
         }),
       });
       this.state.id = "";
-      await this.effects.refreshEntries();
+      const parsed = parse(await response.text());
+      if(parsed.type === 'response') {
+        console.log(parsed.result);
+        await this.effects.refreshEntries();
+      } else if (parsed.type === 'error') {
+        console.log(parsed.error);
+      }
     },
     async changeName(
       _,
@@ -111,14 +109,6 @@ export default provideState({
       }
     ) {
       this.state.content = value;
-    },
-    async changeId(
-      _,
-      {
-        target: { value },
-      }
-    ) {
-      this.state.id = value;
     },
   },
 })(injectState(App));
