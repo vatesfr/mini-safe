@@ -29,7 +29,7 @@ const METHODS = {
       created: Date.now(),
       updated: Date.now(),
     };
-    
+
     entries.set(entry.id, entry);
 
     return entry.id;
