@@ -29,13 +29,14 @@ const METHODS = {
       created: Date.now(),
       updated: Date.now(),
     };
-
+    console.log("createEntry");
     entries.set(entry.id, entry);
 
     return entry.id;
   },
 
   listEntries() {
+    console.log("refresh entries");
     return Array.from(entries.values());
   },
 

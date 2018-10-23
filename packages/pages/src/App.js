@@ -68,7 +68,7 @@ export default provideState({
       });
       this.state.name = "";
       this.state.content = "";
-      this.refreshEntries();
+      await this.effects.refreshEntries();
     },
     async changeName(
       _,
