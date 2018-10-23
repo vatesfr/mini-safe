@@ -68,6 +68,7 @@ export default provideState({
       });
       this.state.name = "";
       this.state.content = "";
+      this.refreshEntries();
     },
     async changeName(
       _,
