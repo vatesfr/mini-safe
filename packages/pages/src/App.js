@@ -94,6 +94,7 @@ export default provideState({
         }),
       });
       this.state.id = "";
+      await this.effects.refreshEntries();
     },
     async changeName(
       _,
