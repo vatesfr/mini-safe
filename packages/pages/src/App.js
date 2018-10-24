@@ -33,11 +33,7 @@ const App = ({ effects, state }) => (
     <div name="createEntry">
       <label>
         Name
-        <input
-          type="text"
-          value={state.name}
-          onChange={effects.changeName}
-        />
+        <input type="text" value={state.name} onChange={effects.changeName} />
       </label>
       <label>
         Content
