@@ -14,8 +14,6 @@ const App = ({ effects, state }) => (
             {entry.name} {entry.content}
             <button
               type="button"
-              id="idEntry"
-              name="deleteEntry"
               value={entry.id}
               onClick={effects.deleteEntry}
             >
@@ -30,8 +28,6 @@ const App = ({ effects, state }) => (
         Name
         <input
           type="text"
-          id="nameEntry"
-          name="name"
           value={state.name}
           onChange={effects.changeName}
         />
@@ -40,8 +36,6 @@ const App = ({ effects, state }) => (
         Content
         <input
           type="text"
-          id="contentEntry"
-          name="content"
           value={state.content}
           onChange={effects.changeContent}
         />
@@ -58,7 +52,6 @@ export default provideState({
     entries: [],
     name: "",
     content: "",
-    id: "",
   }),
   effects: {
     async refreshEntries() {
@@ -86,18 +79,17 @@ export default provideState({
         target: { value },
       }
     ) {
-      this.state.id = value;
       const response = await fetch("/api/", {
         method: "post",
         body: format.request(0, "deleteEntry", {
-          id: this.state.id,
+          id: value,
         }),
       });
-      this.state.id = "";
-      await this.effects.refreshEntries();
       const parsed = parse(await response.text());
       if (parsed.type === "error") {
         console.error(parsed.error);
+      } else if (parsed.type === "response") {
+        await this.effects.refreshEntries();
       }
     },
     async changeName(
