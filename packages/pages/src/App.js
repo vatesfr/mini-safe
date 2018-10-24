@@ -19,6 +19,13 @@ const App = ({ effects, state }) => (
             >
               Delete
             </button>
+            <button
+              type="button"
+              value={entry.id}
+              onClick={effects.updateEntry}
+            >
+              Update
+            </button>
           </li>
         ))}
       </ul>
@@ -85,6 +92,29 @@ export default provideState({
           id: value,
         }),
       });
+      const parsed = parse(await response.text());
+      if (parsed.type === "error") {
+        console.error(parsed.error);
+      } else if (parsed.type === "response") {
+        await this.effects.refreshEntries();
+      }
+    },
+    async updateEntry(
+      _,
+      {
+        target: { value },
+      }
+    ) {
+      const response = await fetch("/api/", {
+        method: "post",
+        body: format.request(0, "updateEntry", {
+          id: value,
+          name: this.state.name,
+          content: this.state.content,
+        }),
+      });
+      this.state.name = "";
+      this.state.content = "";
       const parsed = parse(await response.text());
       if (parsed.type === "error") {
         console.error(parsed.error);
