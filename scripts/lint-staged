@@ -2,12 +2,12 @@
 
 const formatFiles = files => {
   run("./node_modules/.bin/prettier", ["--write"].concat(files));
-  run(
-    "./node_modules/.bin/eslint",
-    ["--ignore-pattern", "!*", "--fix"].concat(files)
-  );
 };
-const testFiles = files => {};
+const testFiles = files => {
+run(
+  "./node_modules/.bin/eslint",
+  ["--ignore-pattern", "!*"].concat(files)
+);};
 
 // -----------------------------------------------------------------------------
 
