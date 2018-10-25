@@ -31,53 +31,25 @@ const App = ({ effects, state }) => (
           </li>
         ))}
       </ul>
-      <fieldset>
-        {state.id !== "" ? (
-          <form onSubmit={effects.submitUpdates}>
-            <label>
-              Name
-              <input
-                type="text"
-                value={state.name}
-                onChange={effects.changeName}
-              />
-            </label>
-            <label>
-              Content
-              <input
-                type="text"
-                value={state.content}
-                onChange={effects.changeContent}
-              />
-            </label>
-            <button type="submit" value="Submit">
-              Update
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={effects.createEntry}>
-            <label>
-              Name
-              <input
-                type="text"
-                value={state.name}
-                onChange={effects.changeName}
-              />
-            </label>
-            <label>
-              Content
-              <input
-                type="text"
-                value={state.content}
-                onChange={effects.changeContent}
-              />
-            </label>
-            <button type="submit" value="Submit">
-              Create
-            </button>
-          </form>
-        )}
-      </fieldset>
+      <form
+        onSubmit={state.id !== "" ? effects.submitUpdates : effects.createEntry}
+      >
+        <label>
+          Name
+          <input type="text" value={state.name} onChange={effects.changeName} />
+        </label>
+        <label>
+          Content
+          <input
+            type="text"
+            value={state.content}
+            onChange={effects.changeContent}
+          />
+        </label>
+        <button type="submit" value="Submit">
+          {state.id !== "" ? "Update" : "Create"}
+        </button>
+      </form>
     </div>
   </div>
 );
