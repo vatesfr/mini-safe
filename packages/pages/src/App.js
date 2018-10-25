@@ -36,12 +36,10 @@ const App = ({ effects, state }) => (
               </button>
               <button
                 type="button"
-                onClick={effects.updateEntry.bind(
-                  this,
-                  entry.id,
-                  entry.name,
-                  entry.content
-                )}
+                data-id={entry.id}
+                data-name={entry.name}
+                data-content={entry.content}
+                onClick={effects.updateEntry}
               >
                 Update
               </button>
@@ -133,20 +131,20 @@ export default provideState({
           content: this.state.content,
         }),
       });
-      this.state.name = "";
-      this.state.content = "";
-      this.state.id = "";
       const parsed = parse(await response.text());
       if (parsed.type === "error") {
         console.error(parsed.error);
       } else if (parsed.type === "response") {
+        this.state.name = "";
+        this.state.content = "";
+        this.state.id = "";
         await this.effects.refreshEntries();
       }
     },
-    async updateEntry(_, id, name, content) {
-      this.state.id = id;
-      this.state.name = name;
-      this.state.content = content;
+    async updateEntry(_, event) {
+      this.state.id = event.target.getAttribute("data-id");
+      this.state.name = event.target.getAttribute("data-name");
+      this.state.content = event.target.getAttribute("data-content");
     },
     async changeName(
       _,
