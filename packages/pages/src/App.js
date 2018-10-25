@@ -4,49 +4,57 @@ import { format, parse } from "json-rpc-protocol";
 
 const App = ({ effects, state }) => (
   <div>
-    {state.id !== "" ? (
-      <form onSubmit={effects.submitUpdates}>
-        <label>
-          <input type="text" value={state.name} onChange={effects.changeName} />
-        </label>
-        <label>
-          <input
-            type="text"
-            value={state.content}
-            onChange={effects.changeContent}
-          />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
-    ) : (
-      <div>
-        <button type="button" onClick={effects.refreshEntries}>
-          Refresh
-        </button>
-        <ul>
-          {state.entries.map(entry => (
-            <li key={entry.id}>
-              {entry.name} {entry.content}
-              <button
-                type="button"
-                value={entry.id}
-                onClick={effects.deleteEntry}
-              >
-                Delete
-              </button>
-              <button
-                type="button"
-                data-id={entry.id}
-                data-name={entry.name}
-                data-content={entry.content}
-                onClick={effects.updateEntry}
-              >
-                Update
-              </button>
-            </li>
-          ))}
-        </ul>
-        <fieldset>
+    <div>
+      <button type="button" onClick={effects.refreshEntries}>
+        Refresh
+      </button>
+      <ul>
+        {state.entries.map(entry => (
+          <li key={entry.id}>
+            {entry.name} {entry.content}
+            <button
+              type="button"
+              value={entry.id}
+              onClick={effects.deleteEntry}
+            >
+              Delete
+            </button>
+            <button
+              type="button"
+              data-id={entry.id}
+              data-name={entry.name}
+              data-content={entry.content}
+              onClick={effects.updateEntry}
+            >
+              Update
+            </button>
+          </li>
+        ))}
+      </ul>
+      <fieldset>
+        {state.id !== "" ? (
+          <form onSubmit={effects.submitUpdates}>
+            <label>
+              Name
+              <input
+                type="text"
+                value={state.name}
+                onChange={effects.changeName}
+              />
+            </label>
+            <label>
+              Content
+              <input
+                type="text"
+                value={state.content}
+                onChange={effects.changeContent}
+              />
+            </label>
+            <button type="submit" value="Submit">
+              Update
+            </button>
+          </form>
+        ) : (
           <form onSubmit={effects.createEntry}>
             <label>
               Name
@@ -68,9 +76,9 @@ const App = ({ effects, state }) => (
               Create
             </button>
           </form>
-        </fieldset>
-      </div>
-    )}
+        )}
+      </fieldset>
+    </div>
   </div>
 );
 
