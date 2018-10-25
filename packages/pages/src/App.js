@@ -119,7 +119,8 @@ export default provideState({
         await this.effects.refreshEntries();
       }
     },
-    async submitUpdates() {
+    async submitUpdates(effects, event) {
+      event.preventDefault();
       const response = await fetch("/api/", {
         method: "post",
         body: format.request(0, "updateEntry", {
@@ -136,7 +137,7 @@ export default provideState({
       } else if (parsed.type === "response") {
         await this.effects.refreshEntries();
       }
-      // this.state.isEditting = false;
+      this.state.isEditting = false;
     },
     async updateEntry(
       _,
