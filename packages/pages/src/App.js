@@ -4,7 +4,7 @@ import { format, parse } from "json-rpc-protocol";
 
 const App = ({ effects, state }) => (
   <div>
-    {state.isEditting ? (
+    {state.id !== "" ? (
       <form onSubmit={effects.submitUpdates}>
         <label>
           <input type="text" value={state.name} onChange={effects.changeName} />
@@ -36,8 +36,12 @@ const App = ({ effects, state }) => (
               </button>
               <button
                 type="button"
-                value={entry.id}
-                onClick={effects.updateEntry}
+                onClick={effects.updateEntry.bind(
+                  this,
+                  entry.id,
+                  entry.name,
+                  entry.content
+                )}
               >
                 Update
               </button>
@@ -45,7 +49,7 @@ const App = ({ effects, state }) => (
           ))}
         </ul>
         <fieldset>
-          <div name="createEntry">
+          <form onSubmit={effects.createEntry}>
             <label>
               Name
               <input
@@ -62,10 +66,10 @@ const App = ({ effects, state }) => (
                 onChange={effects.changeContent}
               />
             </label>
-            <button type="button" onClick={effects.createEntry}>
+            <button type="submit" value="Submit">
               Create
             </button>
-          </div>
+          </form>
         </fieldset>
       </div>
     )}
@@ -78,7 +82,6 @@ export default provideState({
     name: "",
     content: "",
     id: "",
-    isEditting: false,
   }),
   effects: {
     async refreshEntries() {
@@ -88,7 +91,8 @@ export default provideState({
       });
       this.state.entries = parse(await response.text()).result;
     },
-    async createEntry() {
+    async createEntry(effects, event) {
+      event.preventDefault();
       await fetch("/api/", {
         method: "post",
         body: format.request(0, "createEntry", {
@@ -131,22 +135,18 @@ export default provideState({
       });
       this.state.name = "";
       this.state.content = "";
+      this.state.id = "";
       const parsed = parse(await response.text());
       if (parsed.type === "error") {
         console.error(parsed.error);
       } else if (parsed.type === "response") {
         await this.effects.refreshEntries();
       }
-      this.state.isEditting = false;
     },
-    async updateEntry(
-      _,
-      {
-        target: { value },
-      }
-    ) {
-      this.state.isEditting = true;
-      this.state.id = value;
+    async updateEntry(_, id, name, content) {
+      this.state.id = id;
+      this.state.name = name;
+      this.state.content = content;
     },
     async changeName(
       _,
