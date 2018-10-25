@@ -1,6 +1,6 @@
 module.exports = {
-  env: { es6: true, node: true },
-  extends: ["standard", "prettier"],
+  env: { browser: true, es6: true, node: true },
+  extends: ["standard", "standard-jsx", "prettier"],
   parserOptions: {
     ecmaVersion: 8,
     sourceType: "module",
