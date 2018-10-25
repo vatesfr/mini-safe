@@ -4,49 +4,71 @@ import { format, parse } from "json-rpc-protocol";
 
 const App = ({ effects, state }) => (
   <div>
-    <div name="listEntries">
-      <button type="button" onClick={effects.refreshEntries}>
-        Refresh
-      </button>
-      <ul>
-        {state.entries.map(entry => (
-          <li key={entry.id}>
-            {entry.name} {entry.content}
-            <button
-              type="button"
-              value={entry.id}
-              onClick={effects.deleteEntry}
-            >
-              Delete
+    {state.isEditting ? (
+      <form onSubmit={effects.submitUpdates}>
+        <label>
+          <input type="text" value={state.name} onChange={effects.changeName} />
+        </label>
+        <label>
+          <input
+            type="text"
+            value={state.content}
+            onChange={effects.changeContent}
+          />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    ) : (
+      <div>
+        <button type="button" onClick={effects.refreshEntries}>
+          Refresh
+        </button>
+        <ul>
+          {state.entries.map(entry => (
+            <li key={entry.id}>
+              {entry.name} {entry.content}
+              <button
+                type="button"
+                value={entry.id}
+                onClick={effects.deleteEntry}
+              >
+                Delete
+              </button>
+              <button
+                type="button"
+                value={entry.id}
+                onClick={effects.updateEntry}
+              >
+                Update
+              </button>
+            </li>
+          ))}
+        </ul>
+        <fieldset>
+          <div name="createEntry">
+            <label>
+              Name
+              <input
+                type="text"
+                value={state.name}
+                onChange={effects.changeName}
+              />
+            </label>
+            <label>
+              Content
+              <input
+                type="text"
+                value={state.content}
+                onChange={effects.changeContent}
+              />
+            </label>
+            <button type="button" onClick={effects.createEntry}>
+              Create
             </button>
-            <button
-              type="button"
-              value={entry.id}
-              onClick={effects.updateEntry}
-            >
-              Update
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-    <div name="createEntry">
-      <label>
-        Name
-        <input type="text" value={state.name} onChange={effects.changeName} />
-      </label>
-      <label>
-        Content
-        <input
-          type="text"
-          value={state.content}
-          onChange={effects.changeContent}
-        />
-      </label>
-      <button type="button" onClick={effects.createEntry}>
-        Create
-      </button>
-    </div>
+          </div>
+        </fieldset>
+      </div>
+    )}
   </div>
 );
 
@@ -55,6 +77,8 @@ export default provideState({
     entries: [],
     name: "",
     content: "",
+    id: "",
+    isEditting: false,
   }),
   effects: {
     async refreshEntries() {
@@ -95,16 +119,11 @@ export default provideState({
         await this.effects.refreshEntries();
       }
     },
-    async updateEntry(
-      _,
-      {
-        target: { value },
-      }
-    ) {
+    async submitUpdates() {
       const response = await fetch("/api/", {
         method: "post",
         body: format.request(0, "updateEntry", {
-          id: value,
+          id: this.state.id,
           name: this.state.name,
           content: this.state.content,
         }),
@@ -117,6 +136,16 @@ export default provideState({
       } else if (parsed.type === "response") {
         await this.effects.refreshEntries();
       }
+      // this.state.isEditting = false;
+    },
+    async updateEntry(
+      _,
+      {
+        target: { value },
+      }
+    ) {
+      this.state.isEditting = true;
+      this.state.id = value;
     },
     async changeName(
       _,
