@@ -31,9 +31,7 @@ const App = ({ effects, state }) => (
           </li>
         ))}
       </ul>
-      <form
-        onSubmit={state.id !== "" ? effects.submitUpdates : effects.createEntry}
-      >
+      <form onSubmit={effects.submit}>
         <label>
           Name
           <input type="text" value={state.name} onChange={effects.changeName} />
@@ -69,19 +67,6 @@ export default provideState({
       });
       this.state.entries = parse(await response.text()).result;
     },
-    async createEntry(effects, event) {
-      event.preventDefault();
-      await fetch("/api/", {
-        method: "post",
-        body: format.request(0, "createEntry", {
-          name: this.state.name,
-          content: this.state.content,
-        }),
-      });
-      this.state.name = "";
-      this.state.content = "";
-      await this.effects.refreshEntries();
-    },
     async deleteEntry(
       _,
       {
@@ -101,15 +86,25 @@ export default provideState({
         await this.effects.refreshEntries();
       }
     },
-    async submitUpdates(effects, event) {
+    async submit(effects, event) {
       event.preventDefault();
-      const response = await fetch("/api/", {
-        method: "post",
-        body: format.request(0, "updateEntry", {
+
+      var bodyToSend = "";
+      if (this.state.id === "") {
+        bodyToSend = format.request(0, "createEntry", {
+          name: this.state.name,
+          content: this.state.content,
+        });
+      } else {
+        bodyToSend = format.request(0, "updateEntry", {
           id: this.state.id,
           name: this.state.name,
           content: this.state.content,
-        }),
+        });
+      }
+      const response = await fetch("/api/", {
+        method: "post",
+        body: bodyToSend,
       });
       const parsed = parse(await response.text());
       if (parsed.type === "error") {
@@ -121,12 +116,14 @@ export default provideState({
         await this.effects.refreshEntries();
       }
     },
-    async updateEntry(_, event) {
-      this.state.id = event.target.getAttribute("data-id");
-      this.state.name = event.target.getAttribute("data-name");
-      this.state.content = event.target.getAttribute("data-content");
+    updateEntry(_, event) {
+      const { dataset } = event.target;
+
+      this.state.id = dataset.id;
+      this.state.name = dataset.name;
+      this.state.content = dataset.content;
     },
-    async changeName(
+    changeName(
       _,
       {
         target: { value },
@@ -134,7 +131,7 @@ export default provideState({
     ) {
       this.state.name = value;
     },
-    async changeContent(
+    changeContent(
       _,
       {
         target: { value },
