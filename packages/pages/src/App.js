@@ -54,6 +54,9 @@ export default provideState({
     content: "",
   }),
   effects: {
+    async initialize() {
+      await this.effects.refreshEntries();
+    },
     async refreshEntries() {
       const response = await fetch("/api/", {
         method: "post",
