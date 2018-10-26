@@ -98,14 +98,24 @@ export default provideState({
           content,
         }),
       });
-      const parsed = parse(await response.text());
-      if (parsed.type === "error") {
-        console.error(parsed.error);
-      } else if (parsed.type === "response") {
+      // const parsed = parse(await response.text());
+      // if (parsed.type === "error") {
+      // console.error(parsed.error);
+      // } else if (parsed.type === "response") {
+      // this.state.name = "";
+      // this.state.content = "";
+      // this.state.id = "";
+      // await this.effects.refreshEntries();
+      // }
+
+      try {
+        await parse.result(response.text());
         this.state.name = "";
         this.state.content = "";
         this.state.id = "";
         await this.effects.refreshEntries();
+      } catch (error) {
+        console.error(error);
       }
     },
     updateEntry(_, event) {
