@@ -31,7 +31,7 @@ const App = ({ effects, state }) => (
           </li>
         ))}
       </ul>
-      <form onSubmit={effects.submit}>
+      <form onSubmit={effects.submit} onReset={effects.reset}>
         <label>
           Name
           <input type="text" value={state.name} onChange={effects.changeName} />
@@ -44,9 +44,8 @@ const App = ({ effects, state }) => (
             onChange={effects.changeContent}
           />
         </label>
-        <button type="submit" value="Submit">
-          {state.id !== "" ? "Update" : "Create"}
-        </button>
+        <button type="submit">{state.id !== "" ? "Update" : "Create"}</button>
+        <button type="reset">Cancel</button>
       </form>
     </div>
   </div>
@@ -86,7 +85,7 @@ export default provideState({
         await this.effects.refreshEntries();
       }
     },
-    async submit(effects, event) {
+    async submit(_, event) {
       event.preventDefault();
 
       var bodyToSend = "";
@@ -122,6 +121,11 @@ export default provideState({
       this.state.id = dataset.id;
       this.state.name = dataset.name;
       this.state.content = dataset.content;
+    },
+    reset() {
+      this.state.name = "";
+      this.state.content = "";
+      this.state.id = "";
     },
     changeName(
       _,
