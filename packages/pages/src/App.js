@@ -4,7 +4,7 @@ import { format, parse } from "json-rpc-protocol";
 
 const App = ({ effects, state }) => (
   <div>
-    <div name="listEntries">
+    <div>
       <button type="button" onClick={effects.refreshEntries}>
         Refresh
       </button>
@@ -19,30 +19,34 @@ const App = ({ effects, state }) => (
             >
               Delete
             </button>
+            <button
+              type="button"
+              data-id={entry.id}
+              data-name={entry.name}
+              data-content={entry.content}
+              onClick={effects.updateEntry}
+            >
+              Update
+            </button>
           </li>
         ))}
       </ul>
-    </div>
-    <div name="createEntry">
-      <label>
-        Name
-        <input
-          type="text"
-          value={state.name}
-          onChange={effects.changeName}
-        />
-      </label>
-      <label>
-        Content
-        <input
-          type="text"
-          value={state.content}
-          onChange={effects.changeContent}
-        />
-      </label>
-      <button type="button" onClick={effects.createEntry}>
-        Create
-      </button>
+      <form onSubmit={effects.submit} onReset={effects.reset}>
+        <label>
+          Name
+          <input type="text" value={state.name} onChange={effects.changeName} />
+        </label>
+        <label>
+          Content
+          <input
+            type="text"
+            value={state.content}
+            onChange={effects.changeContent}
+          />
+        </label>
+        <button type="submit">{state.id !== "" ? "Update" : "Create"}</button>
+        <button type="reset">Cancel</button>
+      </form>
     </div>
   </div>
 );
@@ -52,6 +56,7 @@ export default provideState({
     entries: [],
     name: "",
     content: "",
+    id: "",
   }),
   effects: {
     async initialize() {
@@ -63,18 +68,6 @@ export default provideState({
         body: format.request(0, "listEntries", {}),
       });
       this.state.entries = parse(await response.text()).result;
-    },
-    async createEntry() {
-      await fetch("/api/", {
-        method: "post",
-        body: format.request(0, "createEntry", {
-          name: this.state.name,
-          content: this.state.content,
-        }),
-      });
-      this.state.name = "";
-      this.state.content = "";
-      await this.effects.refreshEntries();
     },
     async deleteEntry(
       _,
@@ -88,14 +81,45 @@ export default provideState({
           id: value,
         }),
       });
-      const parsed = parse(await response.text());
-      if (parsed.type === "error") {
-        console.error(parsed.error);
-      } else if (parsed.type === "response") {
+      try {
+        await parse.result(await response.text());
         await this.effects.refreshEntries();
+      } catch (error) {
+        console.error(error);
       }
     },
-    async changeName(
+    async submit(_, event) {
+      event.preventDefault();
+
+      const { state } = this;
+      const { id, name, content } = state;
+      const response = await fetch("/api/", {
+        method: "post",
+        body: format.request(0, id === "" ? "createEntry" : "updateEntry", {
+          id: id === "" ? undefined : id,
+          name,
+          content,
+        }),
+      });
+      try {
+        await parse.result(await response.text());
+        this.state.name = "";
+        this.state.content = "";
+        this.state.id = "";
+        await this.effects.refreshEntries();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    updateEntry(_, event) {
+      Object.assign(this.state, event.target.dataset);
+    },
+    reset() {
+      this.state.name = "";
+      this.state.content = "";
+      this.state.id = "";
+    },
+    changeName(
       _,
       {
         target: { value },
@@ -103,7 +127,7 @@ export default provideState({
     ) {
       this.state.name = value;
     },
-    async changeContent(
+    changeContent(
       _,
       {
         target: { value },
