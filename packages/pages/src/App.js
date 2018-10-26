@@ -88,22 +88,15 @@ export default provideState({
     async submit(_, event) {
       event.preventDefault();
 
-      var bodyToSend = "";
-      if (this.state.id === "") {
-        bodyToSend = format.request(0, "createEntry", {
-          name: this.state.name,
-          content: this.state.content,
-        });
-      } else {
-        bodyToSend = format.request(0, "updateEntry", {
-          id: this.state.id,
-          name: this.state.name,
-          content: this.state.content,
-        });
-      }
+      const { state } = this;
+      const { id, name, content } = state;
       const response = await fetch("/api/", {
         method: "post",
-        body: bodyToSend,
+        body: format.request(0, id === "" ? "createEntry" : "updateEntry", {
+          id: id === "" ? undefined : id,
+          name,
+          content,
+        }),
       });
       const parsed = parse(await response.text());
       if (parsed.type === "error") {
