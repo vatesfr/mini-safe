@@ -109,11 +109,7 @@ export default provideState({
       }
     },
     updateEntry(_, event) {
-      const { dataset } = event.target;
-
-      this.state.id = dataset.id;
-      this.state.name = dataset.name;
-      this.state.content = dataset.content;
+      Object.assign(this.state, event.target.dataset);
     },
     reset() {
       this.state.name = "";
