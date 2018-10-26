@@ -78,11 +78,11 @@ export default provideState({
           id: value,
         }),
       });
-      const parsed = parse(await response.text());
-      if (parsed.type === "error") {
-        console.error(parsed.error);
-      } else if (parsed.type === "response") {
+      try {
+        await parse.result(await response.text());
         await this.effects.refreshEntries();
+      } catch (error) {
+        console.error(error);
       }
     },
     async submit(_, event) {
@@ -98,18 +98,8 @@ export default provideState({
           content,
         }),
       });
-      // const parsed = parse(await response.text());
-      // if (parsed.type === "error") {
-      // console.error(parsed.error);
-      // } else if (parsed.type === "response") {
-      // this.state.name = "";
-      // this.state.content = "";
-      // this.state.id = "";
-      // await this.effects.refreshEntries();
-      // }
-
       try {
-        await parse.result(response.text());
+        await parse.result(await response.text());
         this.state.name = "";
         this.state.content = "";
         this.state.id = "";
