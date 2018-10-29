@@ -14,11 +14,17 @@
     "husky": "^1.0.0",
     "lodash": "^4.17.11",
     "prettier": "^1.14.3",
-    "promise-toolbox": "^0.10.1"
+    "promise-toolbox": "^0.10.1",
+    "start-server-and-test": "^1.7.7"
   },
   "husky": {
     "hooks": {
       "pre-commit": "scripts/lint-staged"
     }
+  },
+  "scripts": {
+    "start-server": "./packages/server/index.js",
+    "start-test": "./packages/test/index.js",
+    "test": "start-server-and-test start-server 4000/api/ start-test"
   }
 }
