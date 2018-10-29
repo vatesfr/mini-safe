@@ -34,7 +34,7 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.strictEqual(response.result[0].name, "False_name1_modified");
+        assert.strictEqual(response.result[0].name, "name1_modified");
         assert.strictEqual(response.result[0].content, "content1_modified");
       },
     ],

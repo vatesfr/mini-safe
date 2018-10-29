@@ -25,6 +25,6 @@
   "scripts": {
     "start-server": "./packages/server/index.js",
     "start-test": "./packages/test/index.js",
-    "test": "start-server-and-test start-server 4000 start-test"
+    "test": "start-server-and-test start-server 4000/api/ start-test"
   }
 }
