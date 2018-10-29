@@ -11,6 +11,7 @@ import assert from "assert";
 
 async function main() {
   var TESTCASE = [
+    ["deleteEntries", {}],
     ["createEntry", { name: "name1", content: "content1" }],
     ["createEntry", { name: "name2", content: "content2" }],
     ["createEntry", { name: "name3", content: "content3" }],

@@ -13,6 +13,13 @@
   "dependencies": {
     "esm": "^3.0.84",
     "http-request-plus": "^0.6.0",
-    "json-rpc-protocol": "^0.12.0"
+    "json-rpc-protocol": "^0.12.0",
+    "react-scripts": "^2.0.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=node --watch",
+    "eject": "react-scripts eject"
   }
 }
