@@ -21,4 +21,7 @@ async function main() {
     console.error(response.error);
   }
 }
-main().catch(console.error.bind(console, "FATAL:"));
+main().catch(error => {
+  console.error("FATAL: ", error);
+  process.exit(1);
+});
