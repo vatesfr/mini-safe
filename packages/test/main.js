@@ -11,7 +11,6 @@ import assert from "assert";
 
 async function main() {
   var TESTCASE = [
-    ["deleteEntries", {}],
     ["createEntry", { name: "name1", content: "content1" }],
     ["createEntry", { name: "name2", content: "content2" }],
     ["createEntry", { name: "name3", content: "content3" }],
@@ -35,7 +34,7 @@ async function main() {
       "listEntries",
       {},
       function(response) {
-        assert.strictEqual(response.result[0].name, "name1_modified");
+        assert.strictEqual(response.result[0].name, "False_name1_modified");
         assert.strictEqual(response.result[0].content, "content1_modified");
       },
     ],
