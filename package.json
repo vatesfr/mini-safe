@@ -26,6 +26,6 @@
     "start-server": "./packages/server/index.js",
     "start-test": "./packages/test/index.js",
     "test": "start-server-and-test start-server 4000/api/ start-test",
-    "ci": "npm ci && cd packages/cli/ && npm ci && cd ../pages/ && npm ci && cd ../server/ && npm ci && cd ../test/ && npm ci"
+    "postinstall": "cd packages/cli/ && npm ci && cd ../pages/ && npm ci && cd ../server/ && npm ci && cd ../test/ && npm ci"
   }
 }
