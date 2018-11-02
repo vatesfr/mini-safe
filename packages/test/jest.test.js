@@ -18,14 +18,11 @@ async function call(method, params) {
 }
 
 test("create entry", async () => {
-  const id1 = await call("createEntry", { name: "name1", content: "content1" });
-  expect(id1).toEqual(1);
-
-  const id2 = await call("createEntry", { content: "content2" });
-  expect(id2).toEqual(2);
-
-  const id3 = await call("createEntry", { name: "name3" });
-  expect(id3).toEqual(3);
+  expect(
+    await call("createEntry", { name: "name1", content: "content1" })
+  ).toEqual(1);
+  expect(await call("createEntry", { content: "content2" })).toEqual(2);
+  expect(await call("createEntry", { name: "name3" })).toEqual(3);
 
   const response = await call("listEntries");
 
@@ -63,30 +60,33 @@ test("delete entry", async () => {
 });
 
 test("Error on delete: could not find id 0", async () => {
-  const response = await call("deleteEntry", { id: 0 });
-
-  expect(response.message).toEqual(new jrp.InvalidParameters().message);
+  expect(await call("deleteEntry", { id: 0 })).toThrowError(
+    jrp.InvalidParameters
+  );
 });
 
 test("Error on update: could not find id 0", async () => {
-  const response = await call("updateEntry", {
-    id: 0,
-    name: "name0",
-    content: "content0",
-  });
-
-  expect(response.message).toEqual(new jrp.InvalidParameters().message);
+  expect(
+    async () =>
+      await call("updateEntry", {
+        id: 0,
+        name: "name0",
+        content: "content0",
+      })
+  ).toThrowError(jrp.InvalidParameters);
 });
 
 test("Error on update: name or content expected", async () => {
   const response = await call("updateEntry", { id: 1 });
 
+  // expect(response).toThrowError(jrp.InvalidParameters);
   expect(response.message).toEqual(new jrp.InvalidParameters().message);
 });
 
 test("Error: method not found", async () => {
   const response = await call("inexistantMethod");
 
+  // expect(response).toThrow();
   expect(response.message).toEqual(
     new jrp.MethodNotFound("inexistantMethod").message
   );
