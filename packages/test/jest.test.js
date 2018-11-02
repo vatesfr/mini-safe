@@ -19,20 +19,20 @@ async function call(method, params) {
 
 test("create entry", async () => {
   const id1 = await call("createEntry", { name: "name1", content: "content1" });
-  expect(id1).toBe(1);
+  expect(id1).toEqual(1);
 
   const id2 = await call("createEntry", { content: "content2" });
-  expect(id2).toBe(2);
+  expect(id2).toEqual(2);
 
   const id3 = await call("createEntry", { name: "name3" });
-  expect(id3).toBe(3);
+  expect(id3).toEqual(3);
 
   const response = await call("listEntries");
 
-  expect(response[0].name).toBe("name1");
-  expect(response[0].content).toBe("content1");
-  expect(response[1].content).toBe("content2");
-  expect(response[2].name).toBe("name3");
+  expect(response[0].name).toEqual("name1");
+  expect(response[0].content).toEqual("content1");
+  expect(response[1].content).toEqual("content2");
+  expect(response[2].name).toEqual("name3");
 });
 
 test("update entry", async () => {
@@ -46,12 +46,12 @@ test("update entry", async () => {
 
   const response = await call("listEntries");
 
-  expect(response[0].name).toBe("name1_modified");
-  expect(response[0].content).toBe("content1_modified");
-  expect(response[1].name).toBe("only_name2_modified");
-  expect(response[1].content).toBe("content2");
-  expect(response[2].name).toBe("name3");
-  expect(response[2].content).toBe("only_content3_modified");
+  expect(response[0].name).toEqual("name1_modified");
+  expect(response[0].content).toEqual("content1_modified");
+  expect(response[1].name).toEqual("only_name2_modified");
+  expect(response[1].content).toEqual("content2");
+  expect(response[2].name).toEqual("name3");
+  expect(response[2].content).toEqual("only_content3_modified");
 });
 
 test("delete entry", async () => {
@@ -59,13 +59,13 @@ test("delete entry", async () => {
 
   const response = await call("listEntries");
 
-  expect(response[1]).not.toBe(2);
+  expect(response[1]).not.toEqual(2);
 });
 
 test("Error on delete: could not find id 0", async () => {
   const response = await call("deleteEntry", { id: 0 });
 
-  expect(response.message).toBe(new jrp.InvalidParameters().message);
+  expect(response.message).toEqual(new jrp.InvalidParameters().message);
 });
 
 test("Error on update: could not find id 0", async () => {
@@ -75,19 +75,19 @@ test("Error on update: could not find id 0", async () => {
     content: "content0",
   });
 
-  expect(response.message).toBe(new jrp.InvalidParameters().message);
+  expect(response.message).toEqual(new jrp.InvalidParameters().message);
 });
 
 test("Error on update: name or content expected", async () => {
   const response = await call("updateEntry", { id: 1 });
 
-  expect(response.message).toBe(new jrp.InvalidParameters().message);
+  expect(response.message).toEqual(new jrp.InvalidParameters().message);
 });
 
 test("Error: method not found", async () => {
   const response = await call("inexistantMethod");
 
-  expect(response.message).toBe(
+  expect(response.message).toEqual(
     new jrp.MethodNotFound("inexistantMethod").message
   );
 });
