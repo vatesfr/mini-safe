@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start-server": "./packages/server/index.js",
-    "start-test": "yarn jest packages/test/jest.test.js",
+    "start-test": "jest packages/test/jest.test.js",
     "test": "start-server-and-test start-server 4000/api/ start-test",
     "postinstall": "cd packages/cli/ && npm ci && cd ../pages/ && npm ci && cd ../server/ && npm ci && cd ../test/ && npm ci"
   }

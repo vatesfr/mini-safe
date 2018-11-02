@@ -1,3 +1,5 @@
+/* eslint-env node, jest */
+
 const hrp = require("http-request-plus").default;
 const jrp = require("json-rpc-protocol");
 const assert = require("assert");
