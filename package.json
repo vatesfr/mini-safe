@@ -12,6 +12,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "exec-promise": "^0.7.0",
     "husky": "^1.0.0",
+    "jest": "^23.6.0",
     "lodash": "^4.17.11",
     "prettier": "^1.14.3",
     "promise-toolbox": "^0.10.1",
@@ -27,8 +28,5 @@
     "start-test": "yarn jest packages/test/jest.test.js",
     "test": "start-server-and-test start-server 4000/api/ start-test",
     "postinstall": "cd packages/cli/ && npm ci && cd ../pages/ && npm ci && cd ../server/ && npm ci && cd ../test/ && npm ci"
-  },
-  "dependencies": {
-    "jest": "^23.6.0"
   }
 }

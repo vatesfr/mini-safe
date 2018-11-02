@@ -12,12 +12,16 @@ async function call(method, params) {
   );
 }
 
-test("create entry", async () => {
-  await call("createEntry", { name: "name1", content: "content1" });
-  await call("createEntry", { content: "content2" });
-  await call("createEntry", { name: "name3" });
+test("createe entry", async () => {
+  const id1 = await call("createEntry", { name: "name1", content: "content1" });
+  const id2 = await call("createEntry", { content: "content2" });
+  const id3 = await call("createEntry", { name: "name3" });
 
-  var response = await call("listEntries");
+  assert.strictEqual(id1.result, 1);
+  assert.strictEqual(id2.result, 2);
+  assert.strictEqual(id3.result, 3);
+
+  const response = await call("listEntries");
 
   assert.strictEqual(response.result[0].name, "name1");
   assert.strictEqual(response.result[0].content, "content1");
@@ -34,7 +38,7 @@ test("update entry", async () => {
   await call("updateEntry", { id: 2, name: "only_name2_modified" });
   await call("updateEntry", { id: 3, content: "only_content3_modified" });
 
-  var response = await call("listEntries");
+  const response = await call("listEntries");
 
   assert.strictEqual(response.result[0].name, "name1_modified");
   assert.strictEqual(response.result[0].content, "content1_modified");
@@ -47,13 +51,13 @@ test("update entry", async () => {
 test("delete entry", async () => {
   await call("deleteEntry", { id: 2 });
 
-  var response = await call("listEntries");
+  const response = await call("listEntries");
 
   assert.notStrictEqual(response.result[1], 2);
 });
 
 test("Error on delete: could not find id 0", async () => {
-  var response = await call("deleteEntry", { id: 0 });
+  const response = await call("deleteEntry", { id: 0 });
 
   assert.strictEqual(response.type, "error");
   assert.strictEqual(
@@ -63,7 +67,7 @@ test("Error on delete: could not find id 0", async () => {
 });
 
 test("Error on update: could not find id 0", async () => {
-  var response = await call("updateEntry", {
+  const response = await call("updateEntry", {
     id: 0,
     name: "name0",
     content: "content0",
@@ -77,7 +81,7 @@ test("Error on update: could not find id 0", async () => {
 });
 
 test("Error on update: name or content expected", async () => {
-  var response = await call("updateEntry", { id: 1 });
+  const response = await call("updateEntry", { id: 1 });
 
   assert.strictEqual(response.type, "error");
   assert.strictEqual(
@@ -87,7 +91,7 @@ test("Error on update: name or content expected", async () => {
 });
 
 test("Error: method not found", async () => {
-  var response = await call("inexistantMethod");
+  const response = await call("inexistantMethod");
 
   assert.strictEqual(response.type, "error");
   assert.strictEqual(
