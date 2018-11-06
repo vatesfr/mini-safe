@@ -66,13 +66,12 @@ test("Error on delete: could not find id 0", async () => {
 });
 
 test("Error on update: could not find id 0", async () => {
-  expect(
-    async () =>
-      await call("updateEntry", {
-        id: 0,
-        name: "name0",
-        content: "content0",
-      })
+  expect(async () =>
+    call("updateEntry", {
+      id: 0,
+      name: "name0",
+      content: "content0",
+    })
   ).toThrowError(jrp.InvalidParameters);
 });
 
