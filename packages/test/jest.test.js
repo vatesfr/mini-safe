@@ -22,10 +22,27 @@ test("create entry", async () => {
 
   const response = await call("listEntries");
 
-  expect(response[0].name).toEqual("name1");
-  expect(response[0].content).toEqual("content1");
-  expect(response[1].content).toEqual("content2");
-  expect(response[2].name).toEqual("name3");
+  expect(response).toEqual([
+    {
+      id: 1,
+      name: "name1",
+      content: "content1",
+      created: expect.any(Number),
+      updated: expect.any(Number),
+    },
+    {
+      id: 2,
+      content: "content2",
+      created: expect.any(Number),
+      updated: expect.any(Number),
+    },
+    {
+      id: 3,
+      name: "name3",
+      created: expect.any(Number),
+      updated: expect.any(Number),
+    },
+  ]);
 });
 
 test("update entry", async () => {
@@ -39,12 +56,29 @@ test("update entry", async () => {
 
   const response = await call("listEntries");
 
-  expect(response[0].name).toEqual("name1_modified");
-  expect(response[0].content).toEqual("content1_modified");
-  expect(response[1].name).toEqual("only_name2_modified");
-  expect(response[1].content).toEqual("content2");
-  expect(response[2].name).toEqual("name3");
-  expect(response[2].content).toEqual("only_content3_modified");
+  expect(response).toEqual([
+    {
+      id: 1,
+      name: "name1_modified",
+      content: "content1_modified",
+      created: expect.any(Number),
+      updated: expect.any(Number),
+    },
+    {
+      id: 2,
+      name: "only_name2_modified",
+      content: "content2",
+      created: expect.any(Number),
+      updated: expect.any(Number),
+    },
+    {
+      id: 3,
+      name: "name3",
+      content: "only_content3_modified",
+      created: expect.any(Number),
+      updated: expect.any(Number),
+    },
+  ]);
 });
 
 test("delete entry", async () => {
@@ -56,17 +90,17 @@ test("delete entry", async () => {
 });
 
 test("Error on delete: could not find id 0", async () => {
-  expect(() => call("deleteEntry", { id: 0 })).toThrow(jrp.InvalidParameters);
+  await expect(call("deleteEntry", { id: 0 })).rejects.toThrow();
 });
 
 test("Error on update: could not find id 0", async () => {
-  expect(async () =>
+  await expect(
     call("updateEntry", {
       id: 0,
       name: "name0",
       content: "content0",
     })
-  ).toThrowError(new jrp.InvalidParameters(`could not find id 0`));
+  ).rejects.toThrow();
 });
 
 // test("Error on update: name or content expected", async () => {
