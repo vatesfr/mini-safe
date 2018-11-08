@@ -17,7 +17,7 @@ var entries = new Map();
 let idCounter = 0;
 
 function generateId() {
-  return (idCounter += 1);
+  return String((idCounter += 1));
 }
 
 const METHODS = {
@@ -40,7 +40,7 @@ const METHODS = {
   },
 
   deleteEntry({ id }) {
-    if (!entries.delete(+id)) {
+    if (!entries.delete(id)) {
       throw new InvalidParameters(`could not find entry ${id}`);
     }
   },
@@ -52,7 +52,7 @@ const METHODS = {
       );
     }
 
-    const entry = entries.get(+id);
+    const entry = entries.get(id);
     if (entry === undefined) {
       throw new InvalidParameters(`could not find entry ${id}`);
     }
@@ -66,7 +66,7 @@ const METHODS = {
     }
 
     entry.updated = Date.now();
-    entries.set(+id, entry);
+    entries.set(id, entry);
   },
 };
 
