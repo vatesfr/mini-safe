@@ -14,8 +14,7 @@ async function call(method, params) {
   );
 }
 
-/* Jest doesn't handle correctly when the value is not an error */
-
+// swap promise fulfilment/rejection, very handy to test rejections
 const invertPromise = p =>
   p.then(
     value => {
