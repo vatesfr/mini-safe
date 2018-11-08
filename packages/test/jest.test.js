@@ -126,14 +126,6 @@ test("update entry", async () => {
   ).toBeLessThan(1e2);
 });
 
-test("delete entry", async () => {
-  await call("deleteEntry", { id: entry2.id });
-
-  const response = await call("listEntries");
-
-  expect(response.includes(entry => entry.id === entry2.id)).toBe(false);
-});
-
 test("Error on delete: could not find id 0", async () => {
   expect(
     await invertPromise(
@@ -176,4 +168,16 @@ test("Error: method not found", async () => {
       })
     )
   ).toMatchSnapshot();
+});
+
+test("delete entry", async () => {
+  await call("deleteEntry", { id: entry1.id });
+  await call("deleteEntry", { id: entry2.id });
+  await call("deleteEntry", { id: entry3.id });
+
+  const response = await call("listEntries");
+
+  expect(response.includes(entry => entry.id === entry1.id)).toBe(false);
+  expect(response.includes(entry => entry.id === entry2.id)).toBe(false);
+  expect(response.includes(entry => entry.id === entry3.id)).toBe(false);
 });
