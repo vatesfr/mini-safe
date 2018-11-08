@@ -2,6 +2,7 @@
 
 const hrp = require("http-request-plus").default;
 const jrp = require("json-rpc-protocol");
+const _ = require("lodash");
 
 async function call(method, params) {
   return jrp.parse.result(
@@ -13,8 +14,8 @@ async function call(method, params) {
   );
 }
 
-/* if promise fulfilled, it throws value,
- * else, return reason */
+/* Jest doesn't handle correctly when the value is not an error */
+
 const invertPromise = p =>
   p.then(
     value => {
@@ -23,12 +24,16 @@ const invertPromise = p =>
     reason => reason
   );
 
-let entry1, entry2, entry3;
+function compareTimestamps(ts1, ts2) {
+  return Math.abs(ts1 - ts2) < 1e2;
+}
+
+let entries, id1, id2, id3;
 
 test("create entry", async () => {
-  const id1 = await call("createEntry", { name: "name1", content: "content1" });
-  const id2 = await call("createEntry", { content: "content2" });
-  const id3 = await call("createEntry", { name: "name3" });
+  id1 = await call("createEntry", { name: "name1", content: "content1" });
+  id2 = await call("createEntry", { content: "content2" });
+  id3 = await call("createEntry", { name: "name3" });
 
   const now = Date.now();
   const response = await call("listEntries");
@@ -55,27 +60,25 @@ test("create entry", async () => {
     },
   ]);
 
-  entry1 = response.find(entry => entry.id === id1);
-  entry2 = response.find(entry => entry.id === id2);
-  entry3 = response.find(entry => entry.id === id3);
+  entries = _.keyBy(response, "id");
 
-  expect(entry1.created).toBe(entry1.updated);
-  expect(entry2.created).toBe(entry2.updated);
-  expect(entry3.created).toBe(entry3.updated);
-  expect(Math.abs(entry1.created - now)).toBeLessThan(1e2);
-  expect(Math.abs(entry2.created - now)).toBeLessThan(1e2);
-  expect(Math.abs(entry3.created - now)).toBeLessThan(1e2);
+  expect(entries[id1].created).toBe(entries[id1].updated);
+  expect(entries[id2].created).toBe(entries[id2].updated);
+  expect(entries[id3].created).toBe(entries[id3].updated);
+  expect(compareTimestamps(entries[id1].created, now)).toBe(true);
+  expect(compareTimestamps(entries[id2].created, now)).toBe(true);
+  expect(compareTimestamps(entries[id3].created, now)).toBe(true);
 });
 
 test("update entry", async () => {
   await call("updateEntry", {
-    id: entry1.id,
+    id: id1,
     name: "name1_modified",
     content: "content1_modified",
   });
-  await call("updateEntry", { id: entry2.id, name: "only_name2_modified" });
+  await call("updateEntry", { id: id2, name: "only_name2_modified" });
   await call("updateEntry", {
-    id: entry3.id,
+    id: id3,
     content: "only_content3_modified",
   });
 
@@ -84,21 +87,21 @@ test("update entry", async () => {
 
   expect(response).toEqual([
     {
-      id: entry1.id,
+      id: id1,
       name: "name1_modified",
       content: "content1_modified",
       created: expect.any(Number),
       updated: expect.any(Number),
     },
     {
-      id: entry2.id,
+      id: id2,
       name: "only_name2_modified",
       content: "content2",
       created: expect.any(Number),
       updated: expect.any(Number),
     },
     {
-      id: entry3.id,
+      id: id3,
       name: "name3",
       content: "only_content3_modified",
       created: expect.any(Number),
@@ -106,27 +109,17 @@ test("update entry", async () => {
     },
   ]);
 
-  expect(response.find(entry => entry.id === entry1.id).created).toBe(
-    entry1.created
-  );
-  expect(response.find(entry => entry.id === entry2.id).created).toBe(
-    entry2.created
-  );
-  expect(response.find(entry => entry.id === entry3.id).created).toBe(
-    entry3.created
-  );
-  expect(
-    Math.abs(response.find(entry => entry.id === entry1.id).updated - now)
-  ).toBeLessThan(1e2);
-  expect(
-    Math.abs(response.find(entry => entry.id === entry2.id).updated - now)
-  ).toBeLessThan(1e2);
-  expect(
-    Math.abs(response.find(entry => entry.id === entry3.id).updated - now)
-  ).toBeLessThan(1e2);
+  const entriesUpdated = _.keyBy(response, "id");
+
+  expect(entriesUpdated[id1].created).toBe(entries[id1].created);
+  expect(entriesUpdated[id2].created).toBe(entries[id2].created);
+  expect(entriesUpdated[id3].created).toBe(entries[id3].created);
+  expect(compareTimestamps(entriesUpdated[id1].updated, now)).toBe(true);
+  expect(compareTimestamps(entriesUpdated[id2].updated, now)).toBe(true);
+  expect(compareTimestamps(entriesUpdated[id3].updated, now)).toBe(true);
 });
 
-test("Error on delete: could not find id 0", async () => {
+test("Error on delete: could not find id", async () => {
   expect(
     await invertPromise(
       call("deleteEntry", {
@@ -136,7 +129,7 @@ test("Error on delete: could not find id 0", async () => {
   ).toMatchSnapshot();
 });
 
-test("Error on update: could not find id 0", async () => {
+test("Error on update: could not find id", async () => {
   expect(
     await invertPromise(
       call("updateEntry", {
@@ -171,13 +164,13 @@ test("Error: method not found", async () => {
 });
 
 test("delete entry", async () => {
-  await call("deleteEntry", { id: entry1.id });
-  await call("deleteEntry", { id: entry2.id });
-  await call("deleteEntry", { id: entry3.id });
+  await call("deleteEntry", { id: id1 });
+  await call("deleteEntry", { id: id2 });
+  await call("deleteEntry", { id: id3 });
 
   const response = await call("listEntries");
 
-  expect(response.includes(entry => entry.id === entry1.id)).toBe(false);
-  expect(response.includes(entry => entry.id === entry2.id)).toBe(false);
-  expect(response.includes(entry => entry.id === entry3.id)).toBe(false);
+  expect(response.includes(entry => entry.id === id1)).toBe(false);
+  expect(response.includes(entry => entry.id === id2)).toBe(false);
+  expect(response.includes(entry => entry.id === id3)).toBe(false);
 });

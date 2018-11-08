@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Error on delete: could not find id 0 1`] = `
+exports[`Error on delete: could not find id 1`] = `
 Object {
   "code": -32602,
   "data": "could not find entry 0",
@@ -8,7 +8,7 @@ Object {
 }
 `;
 
-exports[`Error on update: could not find id 0 1`] = `
+exports[`Error on update: could not find id 1`] = `
 Object {
   "code": -32602,
   "data": "could not find entry 0",
