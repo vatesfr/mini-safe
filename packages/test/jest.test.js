@@ -13,6 +13,14 @@ async function call(method, params) {
   );
 }
 
+const invertPromise = p =>
+  p.then(
+    value => {
+      throw value;
+    },
+    reason => reason
+  );
+
 test("create entry", async () => {
   expect(
     await call("createEntry", { name: "name1", content: "content1" })
@@ -90,31 +98,45 @@ test("delete entry", async () => {
 });
 
 test("Error on delete: could not find id 0", async () => {
-  await expect(call("deleteEntry", { id: 0 })).rejects.toThrow();
+  expect(
+    await invertPromise(
+      call("deleteEntry", {
+        id: 0,
+      })
+    )
+  ).toMatchSnapshot();
 });
 
 test("Error on update: could not find id 0", async () => {
-  await expect(
-    call("updateEntry", {
-      id: 0,
-      name: "name0",
-      content: "content0",
-    })
-  ).rejects.toThrow();
+  expect(
+    await invertPromise(
+      call("updateEntry", {
+        id: 0,
+        name: "name0",
+        content: "content0",
+      })
+    )
+  ).toMatchSnapshot();
 });
 
-// test("Error on update: name or content expected", async () => {
-//   const response = await call("updateEntry", { id: 1 });
+test("Error on update: name or content expected", async () => {
+  expect(
+    await invertPromise(
+      call("updateEntry", {
+        id: 1,
+      })
+    )
+  ).toMatchSnapshot();
+});
 
-//   expect(response).toThrowError(jrp.InvalidParameters);
-//   expect(response.message).toThrow(new jrp.InvalidParameters().message);
-// });
-
-// test("Error: method not found", async () => {
-//   const response = await call("inexistantMethod");
-
-//   expect(response).toThrow();
-//   expect(response.message).toThrow(
-//     new jrp.MethodNotFound("inexistantMethod").message
-//   );
-// });
+test("Error: method not found", async () => {
+  expect(
+    await invertPromise(
+      call("inexistantMethod", {
+        id: 0,
+        name: "name0",
+        content: "content0",
+      })
+    )
+  ).toMatchSnapshot();
+});
