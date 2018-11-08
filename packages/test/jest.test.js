@@ -2,7 +2,7 @@
 
 const hrp = require("http-request-plus").default;
 const jrp = require("json-rpc-protocol");
-const _ = require("lodash");
+const _ = require("lodash/keyBy");
 
 async function call(method, params) {
   return jrp.parse.result(
@@ -60,7 +60,7 @@ test("create entry", async () => {
     },
   ]);
 
-  entries = _.keyBy(response, "id");
+  entries = _(response, "id");
 
   expect(entries[id1].created).toBe(entries[id1].updated);
   expect(entries[id2].created).toBe(entries[id2].updated);
@@ -109,7 +109,7 @@ test("update entry", async () => {
     },
   ]);
 
-  const entriesUpdated = _.keyBy(response, "id");
+  const entriesUpdated = _(response, "id");
 
   expect(entriesUpdated[id1].created).toBe(entries[id1].created);
   expect(entriesUpdated[id2].created).toBe(entries[id2].created);
