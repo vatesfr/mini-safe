@@ -111,7 +111,7 @@ test("update entry", async () => {
   expect(entriesUpdated[id2].created).toBe(entries[id2].created);
   expect(entriesUpdated[id3].created).toBe(entries[id3].created);
 
-  keyBy(response, entry => compareTimestamps(entry.updated, now));
+  response.forEach(entry => compareTimestamps(entry.updated, now));
 });
 
 test("Error on delete: could not find id", async () => {
