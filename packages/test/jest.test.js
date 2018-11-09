@@ -2,7 +2,7 @@
 
 const hrp = require("http-request-plus").default;
 const jrp = require("json-rpc-protocol");
-const _ = require("lodash/keyBy");
+const keyBy = require("lodash/keyBy");
 
 async function call(method, params) {
   return jrp.parse.result(
@@ -24,7 +24,7 @@ const invertPromise = p =>
   );
 
 function compareTimestamps(ts1, ts2) {
-  return Math.abs(ts1 - ts2) < 1e2;
+  return expect(Math.abs(ts1 - ts2)).toBeLessThan(1e2);
 }
 
 let entries, id1, id2, id3;
@@ -59,14 +59,12 @@ test("create entry", async () => {
     },
   ]);
 
-  entries = _(response, "id");
+  entries = keyBy(response, "id");
 
-  expect(entries[id1].created).toBe(entries[id1].updated);
-  expect(entries[id2].created).toBe(entries[id2].updated);
-  expect(entries[id3].created).toBe(entries[id3].updated);
-  expect(compareTimestamps(entries[id1].created, now)).toBe(true);
-  expect(compareTimestamps(entries[id2].created, now)).toBe(true);
-  expect(compareTimestamps(entries[id3].created, now)).toBe(true);
+  keyBy(response, function(entry) {
+    expect(entry.created).toBe(entry.updated);
+    compareTimestamps(entry.created, now);
+  });
 });
 
 test("update entry", async () => {
@@ -108,14 +106,14 @@ test("update entry", async () => {
     },
   ]);
 
-  const entriesUpdated = _(response, "id");
-
+  const entriesUpdated = keyBy(response, "id");
   expect(entriesUpdated[id1].created).toBe(entries[id1].created);
   expect(entriesUpdated[id2].created).toBe(entries[id2].created);
   expect(entriesUpdated[id3].created).toBe(entries[id3].created);
-  expect(compareTimestamps(entriesUpdated[id1].updated, now)).toBe(true);
-  expect(compareTimestamps(entriesUpdated[id2].updated, now)).toBe(true);
-  expect(compareTimestamps(entriesUpdated[id3].updated, now)).toBe(true);
+
+  keyBy(response, function(entry) {
+    compareTimestamps(entry.updated, now);
+  });
 });
 
 test("Error on delete: could not find id", async () => {
@@ -169,7 +167,9 @@ test("delete entry", async () => {
 
   const response = await call("listEntries");
 
-  expect(response.includes(entry => entry.id === id1)).toBe(false);
-  expect(response.includes(entry => entry.id === id2)).toBe(false);
-  expect(response.includes(entry => entry.id === id3)).toBe(false);
+  entries = keyBy(response, function(entry) {
+    expect(entry.id === id1 || entry.id === id2 || entry.id === id3).toBe(
+      false
+    );
+  });
 });
