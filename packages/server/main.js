@@ -1,6 +1,3 @@
-import getStream from "get-stream";
-import Koa from "koa";
-import koaStatic from "koa-static";
 import {
   format,
   parse,
@@ -9,9 +6,9 @@ import {
   InvalidParameters,
   MethodNotFound,
 } from "json-rpc-protocol";
-
-// see https://koajs.com/
-const app = new Koa();
+var WebSocketServer = require("ws").Server;
+var ws = new WebSocketServer({ port: 4000 });
+console.log("Server started...");
 
 var entries = new Map();
 let idCounter = 0;
@@ -70,35 +67,32 @@ const METHODS = {
   },
 };
 
-app.use(async (ctx, next) => {
-  if (ctx.path !== "/api/") {
-    return next();
-  }
+ws.on("connection", function(ws) {
+  console.log("Connected");
 
-  try {
-    const request = parse(await getStream(ctx.req));
-    if (request.type !== "request") {
-      throw new InvalidRequest();
+  ws.on("message", async function(req) {
+    try {
+      const request = parse(req);
+      if (request.type !== "request") {
+        throw new InvalidRequest();
+      }
+
+      const method = METHODS[request.method];
+      if (method === undefined) {
+        throw new MethodNotFound(request.method);
+      }
+
+      const result = method(request.params);
+      ws.send(
+        format.response(request.id, result === undefined ? true : result)
+      );
+    } catch (err) {
+      ws.send(
+        format.error(0, new JsonRpcError(err.message, err.code, err.data))
+      );
     }
-
-    const method = METHODS[request.method];
-    if (method === undefined) {
-      throw new MethodNotFound(request.method);
-    }
-
-    const result = method(request.params);
-    ctx.body = format.response(
-      request.id,
-      result === undefined ? true : result
-    );
-  } catch (err) {
-    ctx.body = format.error(
-      0,
-      new JsonRpcError(err.message, err.code, err.data)
-    );
-  }
+  });
+  // ws.on("close", function(event) {
+  //   console.log("Closed")
+  // })
 });
-
-app.use(koaStatic(`${__dirname}/../pages/build`));
-
-app.listen(4000);
