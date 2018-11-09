@@ -111,9 +111,7 @@ test("update entry", async () => {
   expect(entriesUpdated[id2].created).toBe(entries[id2].created);
   expect(entriesUpdated[id3].created).toBe(entries[id3].created);
 
-  keyBy(response, function(entry) {
-    compareTimestamps(entry.updated, now);
-  });
+  keyBy(response, entry => compareTimestamps(entry.updated, now));
 });
 
 test("Error on delete: could not find id", async () => {
@@ -165,11 +163,9 @@ test("delete entry", async () => {
   await call("deleteEntry", { id: id2 });
   await call("deleteEntry", { id: id3 });
 
-  const response = await call("listEntries");
+  const entries = keyBy(await call("listEntries"), "id");
 
-  entries = keyBy(response, function(entry) {
-    expect(entry.id === id1 || entry.id === id2 || entry.id === id3).toBe(
-      false
-    );
-  });
+  expect(id1 in entries).toBe(false);
+  expect(id2 in entries).toBe(false);
+  expect(id3 in entries).toBe(false);
 });
