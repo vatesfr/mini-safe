@@ -61,7 +61,7 @@ test("create entry", async () => {
 
   entries = keyBy(response, "id");
 
-  keyBy(response, function(entry) {
+  response.forEach(function(entry) {
     expect(entry.created).toBe(entry.updated);
     compareTimestamps(entry.created, now);
   });
@@ -106,12 +106,10 @@ test("update entry", async () => {
     },
   ]);
 
-  const entriesUpdated = keyBy(response, "id");
-  expect(entriesUpdated[id1].created).toBe(entries[id1].created);
-  expect(entriesUpdated[id2].created).toBe(entries[id2].created);
-  expect(entriesUpdated[id3].created).toBe(entries[id3].created);
-
-  response.forEach(entry => compareTimestamps(entry.updated, now));
+  response.forEach(function(entry) {
+    expect(entry.created).toBe(entries[entry.id].created);
+    compareTimestamps(entry.updated, now);
+  });
 });
 
 test("Error on delete: could not find id", async () => {
