@@ -63,21 +63,20 @@ export default provideState({
   }),
   effects: {
     initialize() {
-      const t = this;
-      websocket.onopen = async function(evt) {
+      const { effects } = this;
+      websocket.onopen = async function() {
         console.log("Connected to the server");
-        await t.effects.refreshEntries();
+        await effects.refreshEntries();
       };
-      websocket.onerror = function(evt) {
-        console.log(evt);
+      websocket.onerror = function(event) {
+        console.log(event);
       };
     },
     refreshEntries() {
-      var ts = this.state;
-
+      const { state } = this;
       websocket.send(format.request(0, "listEntries", {}));
       websocket.onmessage = async function(event) {
-        ts.entries = await parse(event.data).result;
+        state.entries = await parse(event.data).result;
       };
     },
     deleteEntry(
@@ -86,16 +85,16 @@ export default provideState({
         target: { value },
       }
     ) {
-      const t = this;
+      const { effects } = this;
       websocket.send(
         format.request(0, "deleteEntry", {
           id: value,
         })
       );
-      websocket.onmessage = async function(evt) {
+      websocket.onmessage = async function(event) {
         try {
-          await parse.result(await evt.data);
-          await t.effects.refreshEntries();
+          await parse.result(await event.data);
+          await effects.refreshEntries();
         } catch (error) {
           console.error(error);
         }
@@ -103,9 +102,8 @@ export default provideState({
     },
     submit(_, event) {
       event.preventDefault();
-      const { state } = this;
-      const { id, name, content } = state;
-      var t = this;
+      const { state, effects } = this;
+      var { id, name, content } = state;
       websocket.send(
         format.request(0, id === "" ? "createEntry" : "updateEntry", {
           id: id === "" ? undefined : id,
@@ -116,10 +114,10 @@ export default provideState({
       websocket.onmessage = async function(evt) {
         try {
           await parse.result(await evt.data);
-          t.state.name = "";
-          t.state.content = "";
-          t.state.id = "";
-          await t.effects.refreshEntries();
+          state.id = "";
+          state.name = "";
+          state.content = "";
+          await effects.refreshEntries();
         } catch (error) {
           console.error(error);
         }
