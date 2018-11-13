@@ -2,6 +2,9 @@ import React from "react";
 import { provideState, injectState } from "reaclette";
 import { format, parse } from "json-rpc-protocol";
 
+var websocket = new WebSocket("ws://localhost:4000");
+console.log("Connection...");
+
 const App = ({ effects, state }) => (
   <div>
     <div>
@@ -59,57 +62,66 @@ export default provideState({
     id: "",
   }),
   effects: {
-    async initialize() {
-      await this.effects.refreshEntries();
+    initialize() {
+      const { effects } = this;
+      websocket.onopen = async function() {
+        console.log("Connected to the server");
+        await effects.refreshEntries();
+      };
+      websocket.onerror = function(event) {
+        console.log(event);
+      };
     },
-    async refreshEntries() {
-      const response = await fetch("/api/", {
-        method: "post",
-        body: format.request(0, "listEntries", {}),
-      });
-      this.state.entries = parse(await response.text()).result;
+    refreshEntries() {
+      const { state } = this;
+      websocket.send(format.request(0, "listEntries", {}));
+      websocket.onmessage = async function(event) {
+        state.entries = await parse(event.data).result;
+      };
     },
-    async deleteEntry(
+    deleteEntry(
       _,
       {
         target: { value },
       }
     ) {
-      const response = await fetch("/api/", {
-        method: "post",
-        body: format.request(0, "deleteEntry", {
+      const { effects } = this;
+      websocket.send(
+        format.request(0, "deleteEntry", {
           id: value,
-        }),
-      });
-      try {
-        await parse.result(await response.text());
-        await this.effects.refreshEntries();
-      } catch (error) {
-        console.error(error);
-      }
+        })
+      );
+      websocket.onmessage = async function(event) {
+        try {
+          await parse.result(await event.data);
+          await effects.refreshEntries();
+        } catch (error) {
+          console.error(error);
+        }
+      };
     },
-    async submit(_, event) {
+    submit(_, event) {
       event.preventDefault();
-
-      const { state } = this;
+      const { state, effects } = this;
       const { id, name, content } = state;
-      const response = await fetch("/api/", {
-        method: "post",
-        body: format.request(0, id === "" ? "createEntry" : "updateEntry", {
+      websocket.send(
+        format.request(0, id === "" ? "createEntry" : "updateEntry", {
           id: id === "" ? undefined : id,
           name,
           content,
-        }),
-      });
-      try {
-        await parse.result(await response.text());
-        this.state.name = "";
-        this.state.content = "";
-        this.state.id = "";
-        await this.effects.refreshEntries();
-      } catch (error) {
-        console.error(error);
-      }
+        })
+      );
+      websocket.onmessage = async function(evt) {
+        try {
+          await parse.result(await evt.data);
+          state.id = "";
+          state.name = "";
+          state.content = "";
+          await effects.refreshEntries();
+        } catch (error) {
+          console.error(error);
+        }
+      };
     },
     updateEntry(_, event) {
       Object.assign(this.state, event.target.dataset);
