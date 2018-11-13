@@ -103,7 +103,7 @@ export default provideState({
     submit(_, event) {
       event.preventDefault();
       const { state, effects } = this;
-      var { id, name, content } = state;
+      const { id, name, content } = state;
       websocket.send(
         format.request(0, id === "" ? "createEntry" : "updateEntry", {
           id: id === "" ? undefined : id,

@@ -92,7 +92,7 @@ ws.on("connection", function(ws) {
       );
     }
   });
-  ws.on("close", function(event) {
+  ws.on("close", function() {
     console.log("Closed");
   });
 });
