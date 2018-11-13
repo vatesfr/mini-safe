@@ -1,6 +1,3 @@
-import getStream from "get-stream";
-import Koa from "koa";
-import koaStatic from "koa-static";
 import {
   format,
   parse,
@@ -9,15 +6,15 @@ import {
   InvalidParameters,
   MethodNotFound,
 } from "json-rpc-protocol";
-
-// see https://koajs.com/
-const app = new Koa();
+var WebSocketServer = require("ws").Server;
+var ws = new WebSocketServer({ port: 4000 });
+console.log("Server started...");
 
 var entries = new Map();
 let idCounter = 0;
 
 function generateId() {
-  return (idCounter += 1);
+  return String((idCounter += 1));
 }
 
 const METHODS = {
@@ -36,11 +33,11 @@ const METHODS = {
   },
 
   listEntries() {
-    return Array.from(entries);
+    return Array.from(entries.values());
   },
 
   deleteEntry({ id }) {
-    if (!entries.delete(+id)) {
+    if (!entries.delete(id)) {
       throw new InvalidParameters(`could not find entry ${id}`);
     }
   },
@@ -52,7 +49,7 @@ const METHODS = {
       );
     }
 
-    const entry = entries.get(+id);
+    const entry = entries.get(id);
     if (entry === undefined) {
       throw new InvalidParameters(`could not find entry ${id}`);
     }
@@ -66,7 +63,7 @@ const METHODS = {
     }
 
     entry.updated = Date.now();
-    entries.set(+id, entry);
+    entries.set(id, entry);
   },
 
   deleteEntries() {
@@ -75,31 +72,32 @@ const METHODS = {
   },
 };
 
-app.use(async (ctx, next) => {
-  if (ctx.path !== "/api/") {
-    return next();
-  }
+ws.on("connection", function(ws) {
+  console.log("Connected");
 
-  const request = parse(await getStream(ctx.req));
-  if (request.type !== "request") {
-    throw new InvalidRequest("invalid JSON-RPC message, expected request");
-  }
+  ws.on("message", async function(req) {
+    try {
+      const request = parse(req);
+      if (request.type !== "request") {
+        throw new InvalidRequest();
+      }
 
-  try {
-    const method = METHODS[request.method];
-    if (method === undefined) {
-      throw new MethodNotFound(`could not find method ${request.method}`);
+      const method = METHODS[request.method];
+      if (method === undefined) {
+        throw new MethodNotFound(request.method);
+      }
+
+      const result = method(request.params);
+      ws.send(
+        format.response(request.id, result === undefined ? true : result)
+      );
+    } catch (err) {
+      ws.send(
+        format.error(0, new JsonRpcError(err.message, err.code, err.data))
+      );
     }
-    const result = method(request.params);
-    ctx.body = format.response(request.id, result);
-  } catch (err) {
-    ctx.body = format.error(
-      request.id,
-      new JsonRpcError(err.message, err.code, err.data)
-    );
-  }
+  });
+  ws.on("close", function() {
+    console.log("Closed");
+  });
 });
-
-app.use(koaStatic(`${__dirname}/../pages/build`));
-
-app.listen(3000);

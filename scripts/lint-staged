@@ -2,12 +2,12 @@
 
 const formatFiles = files => {
   run("./node_modules/.bin/prettier", ["--write"].concat(files));
-  run(
-    "./node_modules/.bin/eslint",
-    ["--ignore-pattern", "!*", "--fix"].concat(files)
-  );
 };
-const testFiles = files => {};
+const testFiles = files => {
+run(
+  "./node_modules/.bin/eslint",
+  ["--ignore-pattern", "!*"].concat(files)
+);};
 
 // -----------------------------------------------------------------------------
 
@@ -66,6 +66,8 @@ if (unstaged.length !== 0) {
   }
 }
 
-testFiles(files);
-
+// add formatting changes so that even if the test fails, there won't be
+// stylistic diffs between files and index
 run("git", ["add"].concat(files));
+
+testFiles(files);

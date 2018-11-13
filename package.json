@@ -3,15 +3,30 @@
   "devDependencies": {
     "eslint": "^5.6.0",
     "eslint-config-prettier": "^3.1.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-config-standard-jsx": "^6.0.2",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-standard": "^4.0.0",
     "exec-promise": "^0.7.0",
     "husky": "^1.0.0",
+    "jest": "^23.6.0",
     "lodash": "^4.17.11",
     "prettier": "^1.14.3",
-    "promise-toolbox": "^0.10.1"
+    "promise-toolbox": "^0.10.1",
+    "start-server-and-test": "^1.7.7"
   },
   "husky": {
     "hooks": {
       "pre-commit": "scripts/lint-staged"
     }
+  },
+  "scripts": {
+    "start-server": "./packages/server/index.js",
+    "start-test": "jest packages/test/jest.test.js",
+    "test": "start-server-and-test start-server 4000/api/ start-test",
+    "postinstall": "cd packages/cli/ && npm ci && cd ../pages/ && npm ci && cd ../server/ && npm ci && cd ../test/ && npm ci"
   }
 }

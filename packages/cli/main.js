@@ -9,23 +9,19 @@ async function main() {
 
   const response = parse(
     await hrp
-      .post("http://localhost:3000/api/", {
+      .post("http://localhost:4000/api/", {
         body: format.request(0, method, params),
       })
       .readAll("utf-8")
   );
 
-  if (response.result !== undefined) {
+  if (response.type === "response") {
     console.log(response.result);
-  }
-
-  if (response.error !== undefined) {
-    if (response.error.code === -32601) {
-      /* Method not found */
-      console.log(response.error.message);
-    } else {
-      console.log(response.error.message + " - " + response.error.data);
-    }
+  } else if (response.type === "error") {
+    console.error(response.error);
   }
 }
-main().catch(console.error.bind(console, "FATAL:"));
+main().catch(error => {
+  console.error("FATAL: ", error);
+  process.exit(1);
+});
