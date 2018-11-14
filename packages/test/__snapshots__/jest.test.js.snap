@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Error on delete: could not find id 1`] = `
+Object {
+  "code": -32602,
+  "data": "could not find entry 0",
+  "message": "invalid parameter(s)",
+}
+`;
+
+exports[`Error on update: could not find id 1`] = `
+Object {
+  "code": -32602,
+  "data": "could not find entry 0",
+  "message": "invalid parameter(s)",
+}
+`;
+
+exports[`Error on update: name or content expected 1`] = `
+Object {
+  "code": -32602,
+  "data": "could not update entry 1, name or content expected",
+  "message": "invalid parameter(s)",
+}
+`;
+
+exports[`Error: method not found 1`] = `
+Object {
+  "code": -32601,
+  "data": "inexistantMethod",
+  "message": "method not found: inexistantMethod",
+}
+`;
