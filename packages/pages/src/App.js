@@ -8,9 +8,6 @@ console.log("Connection...");
 const App = ({ effects, state }) => (
   <div>
     <div>
-      <button type="button" onClick={effects.refreshEntries}>
-        Refresh
-      </button>
       <ul>
         {state.entries.map(entry => (
           <li key={entry.id}>
