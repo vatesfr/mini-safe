@@ -1,6 +1,3 @@
-import getStream from "get-stream";
-import Koa from "koa";
-import koaStatic from "koa-static";
 import {
   format,
   parse,
@@ -9,10 +6,11 @@ import {
   InvalidParameters,
   MethodNotFound,
 } from "json-rpc-protocol";
+var WebSocketServer = require("ws").Server;
+var wss = new WebSocketServer({ port: 4000 });
+console.log("Server started...");
 
-// see https://koajs.com/
-const app = new Koa();
-
+var clients = [];
 var entries = new Map();
 let idCounter = 0;
 
@@ -70,35 +68,47 @@ const METHODS = {
   },
 };
 
-app.use(async (ctx, next) => {
-  if (ctx.path !== "/api/") {
-    return next();
-  }
+wss.on("connection", function(wss) {
+  clients.push(wss);
+  console.log("Connected");
 
-  try {
-    const request = parse(await getStream(ctx.req));
-    if (request.type !== "request") {
-      throw new InvalidRequest();
+  wss.on("message", async function(req) {
+    try {
+      const request = parse(req);
+      if (request.type !== "request") {
+        throw new InvalidRequest();
+      }
+
+      const method = METHODS[request.method];
+      if (method === undefined) {
+        throw new MethodNotFound(request.method);
+      }
+
+      var result = method(request.params);
+      wss.send(
+        format.response(request.id, result === undefined ? true : result)
+      );
+
+      if (request.method !== "listEntries") {
+        result = METHODS["listEntries"]();
+        clients.forEach(function(client) {
+          if (client !== wss) {
+            client.send(format.response(request.id, result));
+          }
+        });
+      }
+    } catch (err) {
+      wss.send(
+        format.error(0, new JsonRpcError(err.message, err.code, err.data))
+      );
     }
+  });
 
-    const method = METHODS[request.method];
-    if (method === undefined) {
-      throw new MethodNotFound(request.method);
+  wss.on("close", function() {
+    console.log("Closed");
+    const index = clients.indexOf(wss);
+    if (index > -1) {
+      clients.splice(index, 1);
     }
-
-    const result = method(request.params);
-    ctx.body = format.response(
-      request.id,
-      result === undefined ? true : result
-    );
-  } catch (err) {
-    ctx.body = format.error(
-      0,
-      new JsonRpcError(err.message, err.code, err.data)
-    );
-  }
+  });
 });
-
-app.use(koaStatic(`${__dirname}/../pages/build`));
-
-app.listen(4000);
