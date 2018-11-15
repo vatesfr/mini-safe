@@ -3,11 +3,8 @@ import { provideState, injectState } from "reaclette";
 import { format, parse } from "json-rpc-protocol";
 
 var websocket = new WebSocket("ws://localhost:4000");
-console.log("Connection...");
 
-websocket.onmessage = function(event) {
-  console.log(event.data);
-};
+websocket.onmessage = function(event) {};
 
 const App = ({ effects, state }) => (
   <div>
@@ -69,11 +66,10 @@ export default provideState({
     initialize() {
       const { effects } = this;
       websocket.onopen = async function() {
-        console.log("Connected to the server");
         await effects.refreshEntries();
       };
       websocket.onerror = function(event) {
-        console.log(event);
+        console.error(event);
       };
     },
     refreshEntries() {

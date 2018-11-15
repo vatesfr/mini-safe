@@ -8,7 +8,6 @@ import {
 } from "json-rpc-protocol";
 var WebSocketServer = require("ws").Server;
 var wss = new WebSocketServer({ port: 4000 });
-console.log("Server started...");
 
 var clients = [];
 var entries = new Map();
@@ -70,7 +69,6 @@ const METHODS = {
 
 wss.on("connection", function(wss) {
   clients.push(wss);
-  console.log("Connected");
 
   wss.on("message", async function(req) {
     try {
@@ -90,7 +88,7 @@ wss.on("connection", function(wss) {
       );
 
       if (request.method !== "listEntries") {
-        result = METHODS["listEntries"]();
+        result = METHODS.listEntries();
         clients.forEach(function(client) {
           if (client !== wss) {
             client.send(format.response(request.id, result));
@@ -105,7 +103,6 @@ wss.on("connection", function(wss) {
   });
 
   wss.on("close", function() {
-    console.log("Closed");
     const index = clients.indexOf(wss);
     if (index > -1) {
       clients.splice(index, 1);
