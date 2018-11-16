@@ -9,7 +9,7 @@ import {
 var WebSocketServer = require("ws").Server;
 var wss = new WebSocketServer({ port: 4000 });
 
-var clients = [];
+var clients = new Set();
 var entries = new Map();
 let idCounter = 0;
 
@@ -68,7 +68,7 @@ const METHODS = {
 };
 
 wss.on("connection", function(wss) {
-  clients.push(wss);
+  clients.add(wss);
 
   wss.on("message", async function(req) {
     try {
@@ -103,9 +103,10 @@ wss.on("connection", function(wss) {
   });
 
   wss.on("close", function() {
-    const index = clients.indexOf(wss);
-    if (index > -1) {
-      clients.splice(index, 1);
-    }
+    clients.forEach(function(client) {
+      if (client === wss) {
+        clients.delete(client);
+      }
+    });
   });
 });

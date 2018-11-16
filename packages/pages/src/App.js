@@ -2,10 +2,6 @@ import React from "react";
 import { provideState, injectState } from "reaclette";
 import { format, parse } from "json-rpc-protocol";
 
-var websocket = new WebSocket("ws://localhost:4000");
-
-websocket.onmessage = function(event) {};
-
 const App = ({ effects, state }) => (
   <div>
     <div>
@@ -57,6 +53,7 @@ const App = ({ effects, state }) => (
 
 export default provideState({
   initialState: () => ({
+    websocket: new WebSocket("ws://localhost:4000"),
     entries: [],
     name: "",
     content: "",
@@ -64,18 +61,18 @@ export default provideState({
   }),
   effects: {
     initialize() {
-      const { effects } = this;
-      websocket.onopen = async function() {
+      const { state, effects } = this;
+      state.websocket.onopen = async function() {
         await effects.refreshEntries();
       };
-      websocket.onerror = function(event) {
+      state.websocket.onerror = function(event) {
         console.error(event);
       };
     },
     refreshEntries() {
       const { state } = this;
-      websocket.send(format.request(0, "listEntries", {}));
-      websocket.onmessage = async function(event) {
+      state.websocket.send(format.request(0, "listEntries", {}));
+      state.websocket.onmessage = async function(event) {
         state.entries = await parse(event.data).result;
       };
     },
@@ -85,13 +82,13 @@ export default provideState({
         target: { value },
       }
     ) {
-      const { effects } = this;
-      websocket.send(
+      const { state, effects } = this;
+      state.websocket.send(
         format.request(0, "deleteEntry", {
           id: value,
         })
       );
-      websocket.onmessage = async function(event) {
+      state.websocket.onmessage = async function(event) {
         try {
           await parse.result(await event.data);
           await effects.refreshEntries();
@@ -103,7 +100,7 @@ export default provideState({
     submit(_, event) {
       event.preventDefault();
       const { state, effects } = this;
-      const { id, name, content } = state;
+      const { id, name, content, websocket } = state;
       websocket.send(
         format.request(0, id === "" ? "createEntry" : "updateEntry", {
           id: id === "" ? undefined : id,
