@@ -1,3 +1,6 @@
+import getStream from "get-stream";
+import Koa from "koa";
+import koaStatic from "koa-static";
 import {
   format,
   parse,
@@ -6,8 +9,11 @@ import {
   InvalidParameters,
   MethodNotFound,
 } from "json-rpc-protocol";
-var WebSocketServer = require("ws").Server;
-var wss = new WebSocketServer({ port: 4000 });
+const http = require("http");
+const WebSocket = require("ws");
+
+// see https://koajs.com/
+const app = new Koa();
 
 var clients = new Set();
 var entries = new Map();
@@ -67,39 +73,44 @@ const METHODS = {
   },
 };
 
+app.use(async (ctx, next) => {
+  if (ctx.path !== "/api/") {
+    return next();
+  }
+
+  try {
+    const request = parse(await getStream(ctx.req));
+    if (request.type !== "request") {
+      throw new InvalidRequest();
+    }
+    const method = METHODS[request.method];
+    if (method === undefined) {
+      throw new MethodNotFound(request.method);
+    }
+    const result = method(request.params);
+    ctx.body = format.response(
+      request.id,
+      result === undefined ? true : result
+    );
+  } catch (err) {
+    ctx.body = format.error(
+      0,
+      new JsonRpcError(err.message, err.code, err.data)
+    );
+  }
+});
+
+app.use(koaStatic(`${__dirname}/../pages/build`));
+
+const server = http.createServer(app.callback());
+const wss = new WebSocket.Server({ server });
+
 wss.on("connection", function(wss) {
   clients.add(wss);
 
-  wss.on("message", async function(req) {
-    try {
-      const request = parse(req);
-      if (request.type !== "request") {
-        throw new InvalidRequest();
-      }
-
-      const method = METHODS[request.method];
-      if (method === undefined) {
-        throw new MethodNotFound(request.method);
-      }
-
-      var result = method(request.params);
-      wss.send(
-        format.response(request.id, result === undefined ? true : result)
-      );
-
-      if (request.method !== "listEntries") {
-        result = METHODS.listEntries();
-        clients.forEach(function(client) {
-          if (client !== wss) {
-            client.send(format.response(request.id, result));
-          }
-        });
-      }
-    } catch (err) {
-      wss.send(
-        format.error(0, new JsonRpcError(err.message, err.code, err.data))
-      );
-    }
+  clients.forEach(function(client) {
+    // client.send(format.notification("refreshEntries", METHODS.listEntries()));
+    client.send(format.notification("refreshEntries"));
   });
 
   wss.on("close", function() {
@@ -110,3 +121,5 @@ wss.on("connection", function(wss) {
     });
   });
 });
+
+server.listen(4000);

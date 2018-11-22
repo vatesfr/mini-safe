@@ -68,57 +68,63 @@ export default provideState({
       state.websocket.onerror = function(event) {
         console.error(event);
       };
-    },
-    refreshEntries() {
-      const { state } = this;
-      state.websocket.send(format.request(0, "listEntries", {}));
       state.websocket.onmessage = async function(event) {
-        state.entries = await parse(event.data).result;
+        // state.entries = await parse(event.data).params;
+        // state.entries.map(entry => console.log(entry));
+        if ((await parse(event.data).method) === "refreshEntries") {
+          await effects.refreshEntries();
+          state.entries.map(entry => console.log(entry));
+        }
       };
     },
-    deleteEntry(
+    async refreshEntries() {
+      const response = await fetch("/api/", {
+        method: "post",
+        body: format.request(0, "listEntries", {}),
+      });
+      this.state.entries = parse(await response.text()).result;
+    },
+    async deleteEntry(
       _,
       {
         target: { value },
       }
     ) {
-      const { state, effects } = this;
-      state.websocket.send(
-        format.request(0, "deleteEntry", {
+      const response = await fetch("/api/", {
+        method: "post",
+        body: format.request(0, "deleteEntry", {
           id: value,
-        })
-      );
-      state.websocket.onmessage = async function(event) {
-        try {
-          await parse.result(await event.data);
-          await effects.refreshEntries();
-        } catch (error) {
-          console.error(error);
-        }
-      };
+        }),
+      });
+      try {
+        await parse.result(await response.text());
+        await this.effects.refreshEntries();
+      } catch (error) {
+        console.error(error);
+      }
     },
-    submit(_, event) {
+    async submit(_, event) {
       event.preventDefault();
-      const { state, effects } = this;
-      const { id, name, content, websocket } = state;
-      websocket.send(
-        format.request(0, id === "" ? "createEntry" : "updateEntry", {
+
+      const { state } = this;
+      const { id, name, content } = state;
+      const response = await fetch("/api/", {
+        method: "post",
+        body: format.request(0, id === "" ? "createEntry" : "updateEntry", {
           id: id === "" ? undefined : id,
           name,
           content,
-        })
-      );
-      websocket.onmessage = async function(evt) {
-        try {
-          await parse.result(await evt.data);
-          state.id = "";
-          state.name = "";
-          state.content = "";
-          await effects.refreshEntries();
-        } catch (error) {
-          console.error(error);
-        }
-      };
+        }),
+      });
+      try {
+        await parse.result(await response.text());
+        this.state.name = "";
+        this.state.content = "";
+        this.state.id = "";
+        await this.effects.refreshEntries();
+      } catch (error) {
+        console.error(error);
+      }
     },
     updateEntry(_, event) {
       Object.assign(this.state, event.target.dataset);
@@ -143,6 +149,11 @@ export default provideState({
       }
     ) {
       this.state.content = value;
+    },
+    finalize() {
+      this.state.websocket.close = function() {
+        console.log("websocket closed");
+      };
     },
   },
 })(injectState(App));
