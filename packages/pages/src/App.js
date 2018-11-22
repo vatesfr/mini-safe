@@ -53,6 +53,7 @@ const App = ({ effects, state }) => (
 
 export default provideState({
   initialState: () => ({
+    websocket: new WebSocket("ws://localhost:4000"),
     entries: [],
     name: "",
     content: "",
@@ -60,7 +61,45 @@ export default provideState({
   }),
   effects: {
     async initialize() {
-      await this.effects.refreshEntries();
+      const {
+        effects: { refreshEntries },
+        state,
+      } = this;
+
+      await refreshEntries();
+
+      const { websocket } = state;
+      websocket.onerror = function(event) {
+        console.error(event);
+      };
+      websocket.onmessage = event => {
+        const message = parse(event.data);
+        if (message.type !== "notification") {
+          return;
+        }
+
+        const { method, params } = message;
+        if (method === "createEntry") {
+          state.entries = [...state.entries, params.entry];
+        } else if (method === "deleteEntry") {
+          state.entries = state.entries.filter(entry => entry.id !== params.id);
+        } else if (method === "updateEntry") {
+          const { entry } = params;
+          const { entries } = state;
+          const i = entries.findIndex(candidate => candidate.id === entry.id);
+          if (i === -1) {
+            state.entries = [...entries, entry];
+          } else {
+            state.entries = [
+              ...entries.slice(0, i),
+              entry,
+              ...entries.slice(i + 1),
+            ];
+          }
+        } else {
+          refreshEntries();
+        }
+      };
     },
     async refreshEntries() {
       const response = await fetch("/api/", {
@@ -83,7 +122,6 @@ export default provideState({
       });
       try {
         await parse.result(await response.text());
-        await this.effects.refreshEntries();
       } catch (error) {
         console.error(error);
       }
@@ -106,7 +144,6 @@ export default provideState({
         this.state.name = "";
         this.state.content = "";
         this.state.id = "";
-        await this.effects.refreshEntries();
       } catch (error) {
         console.error(error);
       }
@@ -134,6 +171,9 @@ export default provideState({
       }
     ) {
       this.state.content = value;
+    },
+    finalize() {
+      this.state.websocket.close();
     },
   },
 })(injectState(App));
