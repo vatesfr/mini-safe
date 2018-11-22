@@ -43,8 +43,8 @@ afterAll(() => {
 
 test("create entry", async () => {
   id1 = await call("createEntry", { name: "name1", content: "content1" });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("createEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("createEntry");
   expect(message.params.entry).toEqual({
     id: id1,
     name: "name1",
@@ -54,8 +54,8 @@ test("create entry", async () => {
   });
 
   id2 = await call("createEntry", { content: "content2" });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("createEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("createEntry");
   expect(message.params.entry).toEqual({
     id: id2,
     content: "content2",
@@ -64,8 +64,8 @@ test("create entry", async () => {
   });
 
   id3 = await call("createEntry", { name: "name3" });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("createEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("createEntry");
   expect(message.params.entry).toEqual({
     id: id3,
     name: "name3",
@@ -112,8 +112,8 @@ test("update entry", async () => {
     name: "name1_modified",
     content: "content1_modified",
   });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("updateEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("updateEntry");
   expect(message.params.entry).toEqual({
     id: id1,
     name: "name1_modified",
@@ -123,8 +123,8 @@ test("update entry", async () => {
   });
 
   await call("updateEntry", { id: id2, name: "only_name2_modified" });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("updateEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("updateEntry");
   expect(message.params.entry).toEqual({
     id: id2,
     name: "only_name2_modified",
@@ -137,8 +137,8 @@ test("update entry", async () => {
     id: id3,
     content: "only_content3_modified",
   });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("updateEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("updateEntry");
   expect(message.params.entry).toEqual({
     id: id3,
     name: "name3",
@@ -226,18 +226,18 @@ test("Error: method not found", async () => {
 
 test("delete entry", async () => {
   await call("deleteEntry", { id: id1 });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("deleteEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("deleteEntry");
   expect(message.params.id).toEqual(id1);
 
   await call("deleteEntry", { id: id2 });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("deleteEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("deleteEntry");
   expect(message.params.id).toEqual(id2);
 
   await call("deleteEntry", { id: id3 });
-  expect(message.type).toBe("notification");
-  expect(message.method).toBe("deleteEntry");
+  expect(message.type).toEqual("notification");
+  expect(message.method).toEqual("deleteEntry");
   expect(message.params.id).toEqual(id3);
 
   const entries = keyBy(await call("listEntries"), "id");
