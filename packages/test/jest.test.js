@@ -4,6 +4,8 @@ const hrp = require("http-request-plus").default;
 const jrp = require("json-rpc-protocol");
 const keyBy = require("lodash/keyBy");
 
+const websocket = new WebSocket("ws://localhost:4000");
+
 async function call(method, params) {
   return jrp.parse.result(
     await hrp
@@ -27,12 +29,49 @@ function compareTimestamps(ts1, ts2) {
   return expect(Math.abs(ts1 - ts2)).toBeLessThan(1e2);
 }
 
-let entries, id1, id2, id3;
+let entries, id1, id2, id3, message;
+
+beforeAll(() => {
+  websocket.onmessage = event => {
+    message = jrp.parse(event.data);
+  };
+});
+
+afterAll(() => {
+  websocket.close();
+});
 
 test("create entry", async () => {
   id1 = await call("createEntry", { name: "name1", content: "content1" });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("createEntry");
+  expect(message.params.entry).toEqual({
+    id: id1,
+    name: "name1",
+    content: "content1",
+    created: expect.any(Number),
+    updated: expect.any(Number),
+  });
+
   id2 = await call("createEntry", { content: "content2" });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("createEntry");
+  expect(message.params.entry).toEqual({
+    id: id2,
+    content: "content2",
+    created: expect.any(Number),
+    updated: expect.any(Number),
+  });
+
   id3 = await call("createEntry", { name: "name3" });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("createEntry");
+  expect(message.params.entry).toEqual({
+    id: id3,
+    name: "name3",
+    created: expect.any(Number),
+    updated: expect.any(Number),
+  });
 
   const now = Date.now();
   const response = await call("listEntries");
@@ -73,10 +112,39 @@ test("update entry", async () => {
     name: "name1_modified",
     content: "content1_modified",
   });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("updateEntry");
+  expect(message.params.entry).toEqual({
+    id: id1,
+    name: "name1_modified",
+    content: "content1_modified",
+    created: expect.any(Number),
+    updated: expect.any(Number),
+  });
+
   await call("updateEntry", { id: id2, name: "only_name2_modified" });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("updateEntry");
+  expect(message.params.entry).toEqual({
+    id: id2,
+    name: "only_name2_modified",
+    content: "content2",
+    created: expect.any(Number),
+    updated: expect.any(Number),
+  });
+
   await call("updateEntry", {
     id: id3,
     content: "only_content3_modified",
+  });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("updateEntry");
+  expect(message.params.entry).toEqual({
+    id: id3,
+    name: "name3",
+    content: "only_content3_modified",
+    created: expect.any(Number),
+    updated: expect.any(Number),
   });
 
   const now = Date.now();
@@ -158,8 +226,19 @@ test("Error: method not found", async () => {
 
 test("delete entry", async () => {
   await call("deleteEntry", { id: id1 });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("deleteEntry");
+  expect(message.params.id).toEqual(id1);
+
   await call("deleteEntry", { id: id2 });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("deleteEntry");
+  expect(message.params.id).toEqual(id2);
+
   await call("deleteEntry", { id: id3 });
+  expect(message.type).toBe("notification");
+  expect(message.method).toBe("deleteEntry");
+  expect(message.params.id).toEqual(id3);
 
   const entries = keyBy(await call("listEntries"), "id");
 
