@@ -60,20 +60,44 @@ export default provideState({
     id: "",
   }),
   effects: {
-    initialize() {
-      const { state, effects } = this;
-      state.websocket.onopen = async function() {
-        await effects.refreshEntries();
-      };
-      state.websocket.onerror = function(event) {
+    async initialize() {
+      const {
+        effects: { refreshEntries },
+        state,
+      } = this;
+
+      await refreshEntries();
+
+      const { websocket } = state;
+      websocket.onerror = function(event) {
         console.error(event);
       };
-      state.websocket.onmessage = async function(event) {
-        // state.entries = await parse(event.data).params;
-        // state.entries.map(entry => console.log(entry));
-        if ((await parse(event.data).method) === "refreshEntries") {
-          await effects.refreshEntries();
-          state.entries.map(entry => console.log(entry));
+      websocket.onmessage = event => {
+        const message = parse(event.data);
+        if (message.type !== "notification") {
+          return;
+        }
+
+        const { method, params } = message;
+        if (method === "createEntry") {
+          state.entries = [...state.entries, params.entry];
+        } else if (method === "deleteEntry") {
+          state.entries = state.entries.filter(entry => entry.id !== params.id);
+        } else if (method === "updateEntry") {
+          const { entry } = params;
+          const { entries } = state;
+          const i = entries.findIndex(candidate => candidate.id === entry.id);
+          if (i === -1) {
+            state.entries = [...entries, entry];
+          } else {
+            state.entries = [
+              ...entries.slice(0, i),
+              entry,
+              ...entries.slice(i + 1),
+            ];
+          }
+        } else {
+          refreshEntries();
         }
       };
     },
@@ -98,7 +122,6 @@ export default provideState({
       });
       try {
         await parse.result(await response.text());
-        await this.effects.refreshEntries();
       } catch (error) {
         console.error(error);
       }
@@ -121,7 +144,6 @@ export default provideState({
         this.state.name = "";
         this.state.content = "";
         this.state.id = "";
-        await this.effects.refreshEntries();
       } catch (error) {
         console.error(error);
       }
@@ -151,9 +173,7 @@ export default provideState({
       this.state.content = value;
     },
     finalize() {
-      this.state.websocket.close = function() {
-        console.log("websocket closed");
-      };
+      this.state.websocket.close();
     },
   },
 })(injectState(App));

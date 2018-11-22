@@ -23,6 +23,13 @@ function generateId() {
   return String((idCounter += 1));
 }
 
+function notifyClients(method, params) {
+  const message = format.notification(method, params);
+  clients.forEach(client => {
+    client.send(message);
+  });
+}
+
 const METHODS = {
   createEntry({ name, content }) {
     const entry = {
@@ -34,6 +41,7 @@ const METHODS = {
     };
 
     entries.set(entry.id, entry);
+    notifyClients("createEntry", { entry });
 
     return entry.id;
   },
@@ -46,6 +54,7 @@ const METHODS = {
     if (!entries.delete(id)) {
       throw new InvalidParameters(`could not find entry ${id}`);
     }
+    notifyClients("deleteEntry", { id });
   },
 
   updateEntry({ id, name, content }) {
@@ -70,6 +79,7 @@ const METHODS = {
 
     entry.updated = Date.now();
     entries.set(id, entry);
+    notifyClients("updateEntry", { entry });
   },
 };
 
@@ -108,18 +118,10 @@ const wss = new WebSocket.Server({ server });
 wss.on("connection", function(wss) {
   clients.add(wss);
 
-  clients.forEach(function(client) {
-    // client.send(format.notification("refreshEntries", METHODS.listEntries()));
-    client.send(format.notification("refreshEntries"));
-  });
-
   wss.on("close", function() {
-    clients.forEach(function(client) {
-      if (client === wss) {
-        clients.delete(client);
-      }
-    });
+    clients.delete(wss);
   });
 });
 
 server.listen(4000);
+console.log("server is listening on http://localhost:4000");
