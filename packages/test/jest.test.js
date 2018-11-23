@@ -4,8 +4,6 @@ const hrp = require("http-request-plus").default;
 const jrp = require("json-rpc-protocol");
 const keyBy = require("lodash/keyBy");
 
-const websocket = new WebSocket("ws://localhost:4000");
-
 async function call(method, params) {
   return jrp.parse.result(
     await hrp
@@ -29,23 +27,39 @@ function compareTimestamps(ts1, ts2) {
   return expect(Math.abs(ts1 - ts2)).toBeLessThan(1e2);
 }
 
+const setUpMessage = () => {
+  message = new Promise(resolve => {
+    websocket.onmessage = event => {
+      resolve(jrp.parse(event.data));
+    };
+  });
+};
+
 let entries, id1, id2, id3, message;
 
-beforeAll(() => {
-  websocket.onmessage = event => {
-    message = jrp.parse(event.data);
-  };
+let websocket;
+
+beforeAll(async () => {
+  websocket = new WebSocket("ws://localhost:4000");
+
+  await new Promise(resolve => {
+    websocket.onopen = resolve;
+  });
 });
 
 afterAll(() => {
   websocket.close();
 });
 
-test("create entry", async () => {
+test.only("create entry", async () => {
+  setUpMessage();
   id1 = await call("createEntry", { name: "name1", content: "content1" });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("createEntry");
-  expect(message.params.entry).toEqual({
+
+  const promise1 = message;
+  const message1 = await promise1;
+  expect(message1.type).toEqual("notification");
+  expect(message1.method).toEqual("createEntry");
+  expect(message1.params.entry).toEqual({
     id: id1,
     name: "name1",
     content: "content1",
@@ -53,20 +67,26 @@ test("create entry", async () => {
     updated: expect.any(Number),
   });
 
+  setUpMessage();
   id2 = await call("createEntry", { content: "content2" });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("createEntry");
-  expect(message.params.entry).toEqual({
+  const promise2 = message;
+  const message2 = await promise2;
+  expect(message2.type).toEqual("notification");
+  expect(message2.method).toEqual("createEntry");
+  expect(message2.params.entry).toEqual({
     id: id2,
     content: "content2",
     created: expect.any(Number),
     updated: expect.any(Number),
   });
 
+  setUpMessage();
   id3 = await call("createEntry", { name: "name3" });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("createEntry");
-  expect(message.params.entry).toEqual({
+  const promise3 = message;
+  const message3 = await promise3;
+  expect(message3.type).toEqual("notification");
+  expect(message3.method).toEqual("createEntry");
+  expect(message3.params.entry).toEqual({
     id: id3,
     name: "name3",
     created: expect.any(Number),
@@ -77,25 +97,9 @@ test("create entry", async () => {
   const response = await call("listEntries");
 
   expect(response).toEqual([
-    {
-      id: id1,
-      name: "name1",
-      content: "content1",
-      created: expect.any(Number),
-      updated: expect.any(Number),
-    },
-    {
-      id: id2,
-      content: "content2",
-      created: expect.any(Number),
-      updated: expect.any(Number),
-    },
-    {
-      id: id3,
-      name: "name3",
-      created: expect.any(Number),
-      updated: expect.any(Number),
-    },
+    message1.params.entry,
+    message2.params.entry,
+    message3.params.entry,
   ]);
 
   entries = keyBy(response, "id");
