@@ -27,13 +27,13 @@ function compareTimestamps(ts1, ts2) {
   return expect(Math.abs(ts1 - ts2)).toBeLessThan(1e2);
 }
 
-const setUpMessage = () => {
+function setUpMessage() {
   message = new Promise(resolve => {
     websocket.onmessage = event => {
       resolve(jrp.parse(event.data));
     };
   });
-};
+}
 
 let entries, id1, id2, id3, message;
 
@@ -51,10 +51,9 @@ afterAll(() => {
   websocket.close();
 });
 
-test.only("create entry", async () => {
+test("create entry", async () => {
   setUpMessage();
   id1 = await call("createEntry", { name: "name1", content: "content1" });
-
   const promise1 = message;
   const message1 = await promise1;
   expect(message1.type).toEqual("notification");
@@ -111,14 +110,17 @@ test.only("create entry", async () => {
 });
 
 test("update entry", async () => {
+  setUpMessage();
   await call("updateEntry", {
     id: id1,
     name: "name1_modified",
     content: "content1_modified",
   });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("updateEntry");
-  expect(message.params.entry).toEqual({
+  const promise1 = message;
+  const message1 = await promise1;
+  expect(message1.type).toEqual("notification");
+  expect(message1.method).toEqual("updateEntry");
+  expect(message1.params.entry).toEqual({
     id: id1,
     name: "name1_modified",
     content: "content1_modified",
@@ -126,10 +128,13 @@ test("update entry", async () => {
     updated: expect.any(Number),
   });
 
+  setUpMessage();
   await call("updateEntry", { id: id2, name: "only_name2_modified" });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("updateEntry");
-  expect(message.params.entry).toEqual({
+  const promise2 = message;
+  const message2 = await promise2;
+  expect(message2.type).toEqual("notification");
+  expect(message2.method).toEqual("updateEntry");
+  expect(message2.params.entry).toEqual({
     id: id2,
     name: "only_name2_modified",
     content: "content2",
@@ -137,13 +142,16 @@ test("update entry", async () => {
     updated: expect.any(Number),
   });
 
+  setUpMessage();
   await call("updateEntry", {
     id: id3,
     content: "only_content3_modified",
   });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("updateEntry");
-  expect(message.params.entry).toEqual({
+  const promise3 = message;
+  const message3 = await promise3;
+  expect(message3.type).toEqual("notification");
+  expect(message3.method).toEqual("updateEntry");
+  expect(message3.params.entry).toEqual({
     id: id3,
     name: "name3",
     content: "only_content3_modified",
@@ -155,27 +163,9 @@ test("update entry", async () => {
   const response = await call("listEntries");
 
   expect(response).toEqual([
-    {
-      id: id1,
-      name: "name1_modified",
-      content: "content1_modified",
-      created: expect.any(Number),
-      updated: expect.any(Number),
-    },
-    {
-      id: id2,
-      name: "only_name2_modified",
-      content: "content2",
-      created: expect.any(Number),
-      updated: expect.any(Number),
-    },
-    {
-      id: id3,
-      name: "name3",
-      content: "only_content3_modified",
-      created: expect.any(Number),
-      updated: expect.any(Number),
-    },
+    message1.params.entry,
+    message2.params.entry,
+    message3.params.entry,
   ]);
 
   response.forEach(function(entry) {
@@ -229,20 +219,29 @@ test("Error: method not found", async () => {
 });
 
 test("delete entry", async () => {
+  setUpMessage();
   await call("deleteEntry", { id: id1 });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("deleteEntry");
-  expect(message.params.id).toEqual(id1);
+  const promise1 = message;
+  const message1 = await promise1;
+  expect(message1.type).toEqual("notification");
+  expect(message1.method).toEqual("deleteEntry");
+  expect(message1.params.id).toEqual(id1);
 
+  setUpMessage();
   await call("deleteEntry", { id: id2 });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("deleteEntry");
-  expect(message.params.id).toEqual(id2);
+  const promise2 = message;
+  const message2 = await promise2;
+  expect(message2.type).toEqual("notification");
+  expect(message2.method).toEqual("deleteEntry");
+  expect(message2.params.id).toEqual(id2);
 
+  setUpMessage();
   await call("deleteEntry", { id: id3 });
-  expect(message.type).toEqual("notification");
-  expect(message.method).toEqual("deleteEntry");
-  expect(message.params.id).toEqual(id3);
+  const promise3 = message;
+  const message3 = await promise3;
+  expect(message3.type).toEqual("notification");
+  expect(message3.method).toEqual("deleteEntry");
+  expect(message3.params.id).toEqual(id3);
 
   const entries = keyBy(await call("listEntries"), "id");
 
