@@ -57,14 +57,19 @@ test("create entry", async () => {
     waitMessage(),
     call("createEntry", { name: "name1", content: "content1" }),
   ]);
-  expect(message1.type).toEqual("notification");
-  expect(message1.method).toEqual("createEntry");
-  expect(message1.params.entry).toEqual({
-    id: id1,
-    name: "name1",
-    content: "content1",
-    created: expect.any(Number),
-    updated: expect.any(Number),
+  expect(message1.type).toBe("notification");
+  expect(message1).toEqual({
+    jsonrpc: expect.any(String),
+    method: "createEntry",
+    params: {
+      entry: {
+        id: id1,
+        name: "name1",
+        content: "content1",
+        created: expect.any(Number),
+        updated: expect.any(Number),
+      },
+    },
   });
 
   let message2;
@@ -72,13 +77,18 @@ test("create entry", async () => {
     waitMessage(),
     call("createEntry", { content: "content2" }),
   ]);
-  expect(message2.type).toEqual("notification");
-  expect(message2.method).toEqual("createEntry");
-  expect(message2.params.entry).toEqual({
-    id: id2,
-    content: "content2",
-    created: expect.any(Number),
-    updated: expect.any(Number),
+  expect(message2.type).toBe("notification");
+  expect(message2).toEqual({
+    jsonrpc: expect.any(String),
+    method: "createEntry",
+    params: {
+      entry: {
+        id: id2,
+        content: "content2",
+        created: expect.any(Number),
+        updated: expect.any(Number),
+      },
+    },
   });
 
   let message3;
@@ -86,13 +96,18 @@ test("create entry", async () => {
     waitMessage(),
     call("createEntry", { name: "name3" }),
   ]);
-  expect(message3.type).toEqual("notification");
-  expect(message3.method).toEqual("createEntry");
-  expect(message3.params.entry).toEqual({
-    id: id3,
-    name: "name3",
-    created: expect.any(Number),
-    updated: expect.any(Number),
+  expect(message3.type).toBe("notification");
+  expect(message3).toEqual({
+    jsonrpc: expect.any(String),
+    method: "createEntry",
+    params: {
+      entry: {
+        id: id3,
+        name: "name3",
+        created: expect.any(Number),
+        updated: expect.any(Number),
+      },
+    },
   });
 
   const now = Date.now();
@@ -122,14 +137,19 @@ test("update entry", async () => {
       content: "content1_modified",
     }),
   ]);
-  expect(message1.type).toEqual("notification");
-  expect(message1.method).toEqual("updateEntry");
-  expect(message1.params.entry).toEqual({
-    id: id1,
-    name: "name1_modified",
-    content: "content1_modified",
-    created: expect.any(Number),
-    updated: expect.any(Number),
+  expect(message1.type).toBe("notification");
+  expect(message1).toEqual({
+    jsonrpc: expect.any(String),
+    method: "updateEntry",
+    params: {
+      entry: {
+        id: id1,
+        name: "name1_modified",
+        content: "content1_modified",
+        created: expect.any(Number),
+        updated: expect.any(Number),
+      },
+    },
   });
 
   let message2;
@@ -137,14 +157,19 @@ test("update entry", async () => {
     waitMessage(),
     call("updateEntry", { id: id2, name: "only_name2_modified" }),
   ]);
-  expect(message2.type).toEqual("notification");
-  expect(message2.method).toEqual("updateEntry");
-  expect(message2.params.entry).toEqual({
-    id: id2,
-    name: "only_name2_modified",
-    content: "content2",
-    created: expect.any(Number),
-    updated: expect.any(Number),
+  expect(message2.type).toBe("notification");
+  expect(message2).toEqual({
+    jsonrpc: expect.any(String),
+    method: "updateEntry",
+    params: {
+      entry: {
+        id: id2,
+        name: "only_name2_modified",
+        content: "content2",
+        created: expect.any(Number),
+        updated: expect.any(Number),
+      },
+    },
   });
 
   let message3;
@@ -155,14 +180,19 @@ test("update entry", async () => {
       content: "only_content3_modified",
     }),
   ]);
-  expect(message3.type).toEqual("notification");
-  expect(message3.method).toEqual("updateEntry");
-  expect(message3.params.entry).toEqual({
-    id: id3,
-    name: "name3",
-    content: "only_content3_modified",
-    created: expect.any(Number),
-    updated: expect.any(Number),
+  expect(message3.type).toBe("notification");
+  expect(message3).toEqual({
+    jsonrpc: expect.any(String),
+    method: "updateEntry",
+    params: {
+      entry: {
+        id: id3,
+        name: "name3",
+        content: "only_content3_modified",
+        created: expect.any(Number),
+        updated: expect.any(Number),
+      },
+    },
   });
 
   const now = Date.now();
@@ -230,27 +260,36 @@ test("delete entry", async () => {
     waitMessage(),
     call("deleteEntry", { id: id1 }),
   ]);
-  expect(message1.type).toEqual("notification");
-  expect(message1.method).toEqual("deleteEntry");
-  expect(message1.params.id).toEqual(id1);
+  expect(message1.type).toBe("notification");
+  expect(message1).toEqual({
+    jsonrpc: expect.any(String),
+    method: "deleteEntry",
+    params: { id: id1 },
+  });
 
   let message2;
   [message2] = await Promise.all([
     waitMessage(),
     call("deleteEntry", { id: id2 }),
   ]);
-  expect(message2.type).toEqual("notification");
-  expect(message2.method).toEqual("deleteEntry");
-  expect(message2.params.id).toEqual(id2);
+  expect(message2.type).toBe("notification");
+  expect(message2).toEqual({
+    jsonrpc: expect.any(String),
+    method: "deleteEntry",
+    params: { id: id2 },
+  });
 
   let message3;
   [message3] = await Promise.all([
     waitMessage(),
     call("deleteEntry", { id: id3 }),
   ]);
-  expect(message3.type).toEqual("notification");
-  expect(message3.method).toEqual("deleteEntry");
-  expect(message3.params.id).toEqual(id3);
+  expect(message3.type).toBe("notification");
+  expect(message3).toEqual({
+    jsonrpc: expect.any(String),
+    method: "deleteEntry",
+    params: { id: id3 },
+  });
 
   const entries = keyBy(await call("listEntries"), "id");
 
