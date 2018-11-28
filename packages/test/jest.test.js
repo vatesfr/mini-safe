@@ -59,7 +59,7 @@ test("create entry", async () => {
   ]);
   expect(message1.type).toBe("notification");
   expect(message1).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "createEntry",
     params: {
       entry: {
@@ -79,7 +79,7 @@ test("create entry", async () => {
   ]);
   expect(message2.type).toBe("notification");
   expect(message2).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "createEntry",
     params: {
       entry: {
@@ -98,7 +98,7 @@ test("create entry", async () => {
   ]);
   expect(message3.type).toBe("notification");
   expect(message3).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "createEntry",
     params: {
       entry: {
@@ -139,7 +139,7 @@ test("update entry", async () => {
   ]);
   expect(message1.type).toBe("notification");
   expect(message1).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "updateEntry",
     params: {
       entry: {
@@ -159,7 +159,7 @@ test("update entry", async () => {
   ]);
   expect(message2.type).toBe("notification");
   expect(message2).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "updateEntry",
     params: {
       entry: {
@@ -182,7 +182,7 @@ test("update entry", async () => {
   ]);
   expect(message3.type).toBe("notification");
   expect(message3).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "updateEntry",
     params: {
       entry: {
@@ -262,7 +262,7 @@ test("delete entry", async () => {
   ]);
   expect(message1.type).toBe("notification");
   expect(message1).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "deleteEntry",
     params: { id: id1 },
   });
@@ -274,7 +274,7 @@ test("delete entry", async () => {
   ]);
   expect(message2.type).toBe("notification");
   expect(message2).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "deleteEntry",
     params: { id: id2 },
   });
@@ -286,7 +286,7 @@ test("delete entry", async () => {
   ]);
   expect(message3.type).toBe("notification");
   expect(message3).toEqual({
-    jsonrpc: expect.any(String),
+    jsonrpc: "2.0",
     method: "deleteEntry",
     params: { id: id3 },
   });
