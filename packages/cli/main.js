@@ -4,7 +4,10 @@ import hrp from "http-request-plus";
 import { format, parse } from "json-rpc-protocol";
 
 async function main() {
-  const params = require("minimist")(process.argv.slice(2));
+  const getopts = require("getopts");
+  const params = getopts(process.argv.slice(2), {
+    string: ["id"],
+  });
   const method = params._[0];
 
   const response = parse(
