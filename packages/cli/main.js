@@ -16,11 +16,7 @@ async function main() {
   const method = params._[0];
 =======
   const getopts = require("getopts");
-  const params = getopts(process.argv.slice(2), {
-    default: {
-      watch: false,
-    },
-  });
+  const params = getopts(process.argv.slice(2));
   const method = params._[0];
 >>>>>>> fix(cli): option watch using getopts
 
