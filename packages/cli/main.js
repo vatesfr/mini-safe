@@ -1,11 +1,14 @@
 /* eslint-disable no-console */
 
+import getopts from "getopts";
 import hrp from "http-request-plus";
 import { format, parse } from "json-rpc-protocol";
+import { mapValues, omit } from "lodash";
 
 async function main() {
-  const params = require("minimist")(process.argv.slice(2));
-  const method = params._[0];
+  const opts = getopts(process.argv.slice(2));
+  const method = opts._[0];
+  const params = mapValues(omit(opts, "_"), String);
 
   const response = parse(
     await hrp
