@@ -14,7 +14,7 @@ async function main() {
   if (params.watch) {
     const websocket = new WebSocket("ws://localhost:4000");
 
-    websocket.onerror = function(event) {
+    websocket.onerror = event => {
       console.error(event);
     };
     websocket.onmessage = event => {
