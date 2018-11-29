@@ -7,12 +7,33 @@ import { mapValues, omit } from "lodash";
 const WebSocket = require("ws");
 
 async function main() {
+<<<<<<< HEAD
   const opts = getopts(process.argv.slice(2));
   const method = opts._[0];
   const params = mapValues(omit(opts, "_"), String);
+||||||| merged common ancestors
+  const params = require("minimist")(process.argv.slice(2));
+  const method = params._[0];
+=======
+  const getopts = require("getopts");
+  const params = getopts(process.argv.slice(2), {
+    default: {
+      watch: false,
+    },
+  });
+  const method = params._[0];
+>>>>>>> fix(cli): option watch using getopts
 
+<<<<<<< HEAD
   if (method === "displayEvents") {
     const websocket = new WebSocket("ws://localhost:4000");
+||||||| merged common ancestors
+  if (method === "displayEvents") {
+    let websocket = new WebSocket("ws://localhost:4000");
+=======
+  if (params.watch) {
+    const websocket = new WebSocket("ws://localhost:4000");
+>>>>>>> fix(cli): option watch using getopts
 
     websocket.onerror = function(event) {
       console.error(event);
@@ -25,7 +46,13 @@ async function main() {
       console.log(
         "method: %s\n %s\n",
         message.method,
+<<<<<<< HEAD
         JSON.stringify(message.params, { showHiddent: true })
+||||||| merged common ancestors
+        util.inspect(message.params, { showHiddent: true })
+=======
+        JSON.stringify(message.params)
+>>>>>>> fix(cli): option watch using getopts
       );
     };
   } else {
