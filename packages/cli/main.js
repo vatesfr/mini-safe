@@ -5,11 +5,10 @@ import { mapValues, omit } from "lodash";
 import WebSocket from "ws";
 
 async function main() {
-  let opts = getopts(process.argv.slice(2), {
-    stopEarly: true,
-  });
+  const args = process.argv.slice(2);
+  const { watch } = getopts(args, { stopEarly: true });
 
-  if (opts.watch) {
+  if (watch) {
     const websocket = new WebSocket("ws://localhost:4000");
 
     websocket.onerror = event => {
@@ -27,7 +26,7 @@ async function main() {
       );
     };
   } else {
-    opts = getopts(process.argv.slice(2));
+    const opts = getopts(args);
     const method = opts._[0];
     const params = mapValues(omit(opts, "_"), String);
     const response = parse(
