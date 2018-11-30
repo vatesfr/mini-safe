@@ -27,7 +27,7 @@ async function main() {
       );
     };
   } else {
-    opts = getopts(opts._);
+    opts = getopts(process.argv.slice(2));
     const method = opts._[0];
     const params = mapValues(omit(opts, "_"), String);
     const response = parse(
