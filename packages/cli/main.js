@@ -4,7 +4,7 @@ import getopts from "getopts";
 import hrp from "http-request-plus";
 import { format, parse } from "json-rpc-protocol";
 import { mapValues, omit } from "lodash";
-const WebSocket = require("ws");
+import * as WebSocket from "ws";
 
 async function main() {
   async function call(method, params) {
