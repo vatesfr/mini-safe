@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import getopts from "getopts";
 import hrp from "http-request-plus";
 import { format, parse } from "json-rpc-protocol";
