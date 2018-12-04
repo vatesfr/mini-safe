@@ -5,8 +5,7 @@ import { mapValues, omit } from "lodash";
 import WebSocket from "ws";
 
 async function main() {
-  const args = process.argv.slice(2);
-  const { watch } = getopts(args, {
+  const { watch, _: optionsLeft } = getopts(process.argv.slice(2), {
     stopEarly: true,
     boolean: ["watch"],
   });
@@ -29,7 +28,7 @@ async function main() {
       );
     };
   } else {
-    const opts = getopts(args);
+    const opts = getopts(optionsLeft);
     const method = opts._[0];
     const params = mapValues(omit(opts, "_"), String);
     const response = parse(
