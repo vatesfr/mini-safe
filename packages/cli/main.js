@@ -6,7 +6,10 @@ import WebSocket from "ws";
 
 async function main() {
   const args = process.argv.slice(2);
-  const { watch } = getopts(args, { stopEarly: true });
+  const { watch } = getopts(args, {
+    stopEarly: true,
+    boolean: ["watch"],
+  });
 
   if (watch) {
     const websocket = new WebSocket("ws://localhost:4000");
